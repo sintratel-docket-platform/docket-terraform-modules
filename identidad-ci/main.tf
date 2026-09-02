@@ -1,13 +1,4 @@
-# Federacion OIDC con GitHub Actions y los dos roles que asume la pipeline.
-#
-# Dos roles y no uno: el job que construye imagenes no tiene por que poder crear
-# clusteres. Responde al criterio de accesos limitados segun necesidad de la
-# historia 18 del tablero.
-
 locals {
-  # Una condicion por cada par de repositorio y rama. Sin acotar ambos, el rol
-  # queda asumible desde cualquier repositorio de la organizacion, que equivale
-  # a una credencial compartida.
   build_subjects = flatten([
     for repo in var.build_repositories : [
       for rama in var.allowed_branches : "repo:${var.github_org}/${repo}:ref:refs/heads/${rama}"
@@ -54,7 +45,7 @@ data "aws_iam_policy_document" "build_trust" {
 }
 
 data "aws_iam_policy_document" "build_permissions" {
-  # El token de autenticacion de ECR no admite acotar por recurso.
+  # ECR no admite acotar esta accion por recurso.
   statement {
     sid       = "AutenticarContraECR"
     effect    = "Allow"

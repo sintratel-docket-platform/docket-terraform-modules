@@ -1,12 +1,4 @@
-# VPC con subredes publicas y privadas repartidas en dos zonas de disponibilidad.
-#
-# Las subredes llevan etiquetas que EKS y el AWS Load Balancer Controller usan
-# para descubrirlas por su cuenta: sin ellas, el controller no sabe donde crear
-# el balanceador ni EKS donde colocar los nodos.
-
 locals {
-  # Un unico NAT compartido por ambas zonas es una concesion de costo. La
-  # contrapartida: si cae la zona del NAT, la otra pierde salida a internet.
   nat_count = var.single_nat_gateway ? 1 : length(var.availability_zones)
 }
 
@@ -49,15 +41,13 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name = "docket-efimero-privada-${var.availability_zones[count.index]}"
-    # La equivalente para balanceadores internos.
+    Name                                        = "docket-efimero-privada-${var.availability_zones[count.index]}"
     "kubernetes.io/role/internal-elb"           = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
-# La IP elastica y el NAT van juntos en el mismo modulo para que Terraform los
-# destruya a la vez. Una IP elastica sin asociar sigue facturando.
+# Van juntos para que Terraform los destruya a la vez. Ver CONVENCIONES.md.
 resource "aws_eip" "nat" {
   count  = local.nat_count
   domain = "vpc"
@@ -94,8 +84,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Una tabla por subred privada, para que cada zona pueda apuntar a su propio NAT
-# el dia que se decida dejar de compartirlo.
+# Una tabla por zona, para poder dejar de compartir el NAT sin rehacerlas.
 resource "aws_route_table" "private" {
   count = length(var.private_subnet_cidrs)
 
@@ -150,8 +139,7 @@ resource "aws_security_group" "nodes" {
   tags = { Name = "docket-efimero-nodos" }
 }
 
-# Modo ip del AWS Load Balancer Controller: el trafico llega al puerto del
-# contenedor, no a un NodePort. Ver CONVENCIONES.md.
+# Modo ip del controller: el trafico llega al puerto del contenedor.
 resource "aws_vpc_security_group_ingress_rule" "nodes_from_alb" {
   security_group_id            = aws_security_group.nodes.id
   description                  = "Trafico del balanceador hacia los pods"

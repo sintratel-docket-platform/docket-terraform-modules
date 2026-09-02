@@ -1,16 +1,9 @@
-# Un repositorio de ECR por microservicio.
-#
-# La capa gratuita de ECR cubre 500 MB al mes, asi que la politica de ciclo de
-# vida no es opcional: sin ella el historial de tags crece hasta desbordarla.
-
 resource "aws_ecr_repository" "this" {
   for_each = toset(var.service_names)
 
   name = "docket/${each.value}"
 
-  # Las etiquetas de imagen no se pueden sobrescribir. Es lo que hace posible la
-  # promocion declarativa entre ambientes: si una etiqueta pudiera reescribirse,
-  # el manifiesto no cambiaria y Argo CD no detectaria nada.
+  # Requisito del flujo GitOps. Ver ambientes.md en docket-architecture.
   image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
