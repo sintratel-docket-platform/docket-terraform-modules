@@ -28,3 +28,9 @@ variable "state_bucket_arn" {
   description = "Bucket del estado de Terraform, al que el rol de infraestructura necesita acceso de lectura y escritura."
   type        = string
 }
+
+variable "thumbprints" {
+  description = "Huellas del certificado de GitHub. AWS las verifica por su cuenta desde 2023, y el campo sigue siendo obligatorio en la API."
+  type        = list(string)
+  default     = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+}
