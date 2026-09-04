@@ -65,3 +65,14 @@ variable "oidc_thumbprints" {
   type        = list(string)
   default     = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
 }
+
+variable "node_security_group_id" {
+  description = "Security group de los nodos, creado por el modulo de red."
+  type        = string
+}
+
+variable "node_capacity_type" {
+  description = "ON_DEMAND o SPOT. El tipo de capacidad de los nodos."
+  type        = string
+  default     = "ON_DEMAND"
+}
