@@ -76,3 +76,8 @@ variable "node_capacity_type" {
   type        = string
   default     = "ON_DEMAND"
 }
+
+variable "cluster_admin_principals" {
+  description = "ARNs de IAM que reciben administracion del cluster."
+  type        = list(string)
+}
