@@ -47,3 +47,21 @@ variable "node_disk_size" {
   type        = number
   default     = 20
 }
+
+variable "public_access_cidrs" {
+  description = "Rangos desde los que se admite llegar al endpoint publico de la API."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "enabled_log_types" {
+  description = "Registros del plano de control enviados a CloudWatch."
+  type        = list(string)
+  default     = []
+}
+
+variable "oidc_thumbprints" {
+  description = "Huellas del certificado del emisor OIDC del cluster."
+  type        = list(string)
+  default     = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
+}
