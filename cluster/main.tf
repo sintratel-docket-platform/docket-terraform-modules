@@ -141,3 +141,45 @@ resource "aws_eks_node_group" "this" {
 
   depends_on = [aws_iam_role_policy_attachment.nodes]
 }
+
+data "aws_eks_addon_version" "this" {
+  for_each = toset(["vpc-cni", "coredns", "kube-proxy", "eks-pod-identity-agent"])
+
+  addon_name         = each.value
+  kubernetes_version = aws_eks_cluster.this.version
+  most_recent        = false
+}
+
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name  = aws_eks_cluster.this.name
+  addon_name    = "vpc-cni"
+  addon_version = data.aws_eks_addon_version.this["vpc-cni"].version
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  # Sin enableNetworkPolicy el CNI acepta las NetworkPolicy y no las aplica nunca.
+  configuration_values = jsonencode({
+    enableNetworkPolicy = "true"
+    nodeAgent = {
+      enablePolicyEventLogs = "true"
+    }
+  })
+
+  tags = { Name = "docket-efimero-vpc-cni" }
+}
+
+resource "aws_eks_addon" "otros" {
+  for_each = toset(["coredns", "kube-proxy", "eks-pod-identity-agent"])
+
+  cluster_name  = aws_eks_cluster.this.name
+  addon_name    = each.value
+  addon_version = data.aws_eks_addon_version.this[each.value].version
+
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+
+  depends_on = [aws_eks_node_group.this]
+
+  tags = { Name = "docket-efimero-${each.value}" }
+}
