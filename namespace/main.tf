@@ -58,3 +58,76 @@ resource "kubernetes_limit_range" "this" {
     }
   }
 }
+
+locals {
+  operator_group = var.operator_group != "" ? var.operator_group : "docket:${var.environment}"
+}
+
+resource "kubernetes_service_account" "aplicacion" {
+  metadata {
+    name      = "docket"
+    namespace = kubernetes_namespace.this.metadata[0].name
+  }
+
+  automount_service_account_token = false
+}
+
+resource "kubernetes_role" "operador" {
+  metadata {
+    name      = "operador"
+    namespace = kubernetes_namespace.this.metadata[0].name
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "pods/log", "services", "configmaps", "events", "persistentvolumeclaims", "resourcequotas"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["apps"]
+    resources  = ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs      = ["get", "list", "watch", "patch", "update"]
+  }
+
+  rule {
+    api_groups = ["batch"]
+    resources  = ["jobs", "cronjobs"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["networking.k8s.io"]
+    resources  = ["ingresses", "networkpolicies"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  dynamic "rule" {
+    for_each = var.allow_exec ? [1] : []
+
+    content {
+      api_groups = [""]
+      resources  = ["pods/exec", "pods/portforward"]
+      verbs      = ["create"]
+    }
+  }
+}
+
+resource "kubernetes_role_binding" "operador" {
+  metadata {
+    name      = "operador"
+    namespace = kubernetes_namespace.this.metadata[0].name
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.operador.metadata[0].name
+  }
+
+  subject {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = local.operator_group
+  }
+}

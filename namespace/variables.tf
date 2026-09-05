@@ -50,3 +50,15 @@ variable "container_defaults" {
     max_memory     = "1Gi"
   }
 }
+
+variable "allow_exec" {
+  description = "Permite al operador abrir una shell dentro de un pod."
+  type        = bool
+  default     = true
+}
+
+variable "operator_group" {
+  description = "Grupo de Kubernetes al que se concede el rol de operador."
+  type        = string
+  default     = ""
+}
