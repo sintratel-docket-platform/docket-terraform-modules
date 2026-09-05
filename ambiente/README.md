@@ -22,5 +22,3 @@ Esto mantiene los secretos fuera del repositorio y fuera del estado en texto pla
 |---|---|---|
 | `parameter_prefix` | Prefijo del árbol, `/docket/<ambiente>/` | La política del rol de IRSA del ambiente |
 | `parameter_arns` | ARN de los parámetros creados | Esa misma política, para acotarla al prefijo |
-
-Los outputs llegan junto con los recursos, en la historia `04`.

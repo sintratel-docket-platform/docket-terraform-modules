@@ -22,5 +22,3 @@ Incluye un único NAT Gateway compartido por ambas zonas, decisión de costo reg
 | `vpc_id` | Identificador de la VPC | El módulo `cluster` |
 | `public_subnet_ids` | Subredes públicas | El módulo `cluster`, para el balanceador |
 | `private_subnet_ids` | Subredes privadas | El módulo `cluster`, para los nodos |
-
-Los outputs llegan junto con los recursos, en la historia `04`.

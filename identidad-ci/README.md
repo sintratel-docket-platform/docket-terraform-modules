@@ -29,5 +29,3 @@ La política de confianza se construye con una condición sobre `sub` del tipo `
 | `build_role_arn` | ARN del rol de build | El workflow de construcción de imágenes |
 | `deploy_role_arn` | ARN del rol de Terraform | El workflow de infraestructura |
 | `oidc_provider_arn` | Proveedor OIDC de GitHub | Referencia para políticas adicionales |
-
-Los outputs llegan junto con los recursos, en la historia `04`.

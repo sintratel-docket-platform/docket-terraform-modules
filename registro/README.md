@@ -18,5 +18,3 @@ La capa gratuita de ECR cubre 500 MB al mes, así que la poda no es opcional. El
 |---|---|---|
 | `repository_urls` | Mapa de servicio a URL del repositorio | Los manifiestos de despliegue y la pipeline |
 | `repository_arns` | Lista de ARN | El módulo `identidad-ci`, para acotar el rol de build |
-
-Los outputs llegan junto con los recursos, en la historia `04`.
