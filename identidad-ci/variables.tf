@@ -3,6 +3,16 @@ variable "github_org" {
   type        = string
 }
 
+variable "github_org_id" {
+  description = "Identificador numerico de la organizacion."
+  type        = string
+}
+
+variable "repository_ids" {
+  description = "Identificador numerico de cada repositorio, indexado por nombre."
+  type        = map(string)
+}
+
 variable "build_repositories" {
   description = "Repositorios cuyo job de build puede asumir el rol limitado a ECR."
   type        = list(string)
