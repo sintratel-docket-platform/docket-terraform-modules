@@ -37,7 +37,7 @@ La quinta capa vive fuera del clúster: cada rol de IRSA solo lee su prefijo de 
 
 ---
 
-**Las etiquetas del namespace son funcionales.** `pod-security.kubernetes.io/enforce` activa un control incorporado de Kubernetes que rechaza pods según lo que pidan, sin instalar nada. El módulo pone `baseline` en `enforce` y `restricted` en `warn`: `enforce` rechaza el pod, `warn` lo admite y enumera lo que le falta. Los manifiestos de la aplicación declaran ese `securityContext` a partir de la historia `10`, y entonces `enforce` puede subir a `restricted`.
+**Las etiquetas del namespace son funcionales.** `pod-security.kubernetes.io/enforce` activa un control incorporado de Kubernetes que rechaza pods según lo que pidan, sin instalar nada. El módulo pone `baseline` en `enforce` y `restricted` en `warn`: `enforce` rechaza el pod, `warn` lo admite y enumera lo que le falta. Los manifiestos de la aplicación declaran ese `securityContext` a partir de la historia `14`, y entonces `enforce` puede subir a `restricted`.
 
 **Sin `LimitRange`, la cuota rompería todo despliegue.** Con una `ResourceQuota` de CPU o memoria activa, un pod que no declare `resources` es **rechazado**. : el sistema de cuotas no puede contabilizar lo que no sabe cuánto pide. El `LimitRange` actúa antes, rellena los valores por defecto, y el pod llega a la cuota con números.
 
