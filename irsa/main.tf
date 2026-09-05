@@ -31,7 +31,22 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_role_policy" "this" {
+  count = var.policy_json == "" ? 0 : 1
+
   name   = var.policy_name
   role   = aws_iam_role.this.id
   policy = var.policy_json
+}
+
+# Los roles creados antes de que la politica en linea fuera opcional.
+moved {
+  from = aws_iam_role_policy.this
+  to   = aws_iam_role_policy.this[0]
+}
+
+resource "aws_iam_role_policy_attachment" "gestionadas" {
+  for_each = toset(var.managed_policy_arns)
+
+  role       = aws_iam_role.this.name
+  policy_arn = each.value
 }

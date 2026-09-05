@@ -12,7 +12,8 @@ Un rol de IAM que solo puede asumir un `ServiceAccount` concreto de un namespace
 | `namespace` | Namespace del `ServiceAccount` autorizado |
 | `service_account` | Nombre del `ServiceAccount` autorizado |
 | `policy_name` | Nombre de la política en línea |
-| `policy_json` | Permisos del rol |
+| `policy_json` | Permisos del rol. Vacío si solo lleva gestionadas |
+| `managed_policy_arns` | Políticas gestionadas de AWS que se adjuntan |
 
 ## Salidas
 
@@ -28,3 +29,9 @@ La política de confianza apunta al proveedor OIDC del clúster, cuya URL contie
 ---
 
 La condición sobre `sub` exige el valor exacto `system:serviceaccount:<namespace>:<service_account>`. Sin ella, cualquier `ServiceAccount` del clúster podría asumir el rol, y la separación entre ambientes desaparecería sin que nada lo indicara.
+
+## Política en línea y política gestionada
+
+Un rol puede llevar una de las dos, o las dos. La política en línea se escribe en `policy_json` y se crea solo si viene con contenido. Las gestionadas se pasan por ARN en `managed_policy_arns`.
+
+El driver de EBS es el caso de política gestionada. Usa `AmazonEBSCSIDriverPolicy`, que mantiene AWS, y copiar su JSON al repositorio dejaría una copia que envejece sin avisar.

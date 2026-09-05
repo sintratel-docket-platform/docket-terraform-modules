@@ -26,9 +26,17 @@ variable "service_account" {
 variable "policy_name" {
   description = "Nombre de la politica en linea del rol."
   type        = string
+  default     = ""
 }
 
 variable "policy_json" {
-  description = "Politica de permisos del rol, en JSON."
+  description = "Politica de permisos del rol, en JSON. Vacia si el rol solo lleva politicas gestionadas."
   type        = string
+  default     = ""
+}
+
+variable "managed_policy_arns" {
+  description = "Politicas gestionadas de AWS que se adjuntan al rol."
+  type        = list(string)
+  default     = []
 }
