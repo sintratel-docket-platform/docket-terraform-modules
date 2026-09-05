@@ -131,3 +131,26 @@ resource "kubernetes_role_binding" "operador" {
     name      = local.operator_group
   }
 }
+
+resource "kubernetes_network_policy" "aislamiento" {
+  metadata {
+    name      = "aislamiento-por-ambiente"
+    namespace = kubernetes_namespace.this.metadata[0].name
+  }
+
+  spec {
+    pod_selector {}
+
+    policy_types = ["Ingress"]
+
+    ingress {
+      from {
+        namespace_selector {
+          match_labels = {
+            "kubernetes.io/metadata.name" = kubernetes_namespace.this.metadata[0].name
+          }
+        }
+      }
+    }
+  }
+}
