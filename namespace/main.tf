@@ -155,6 +155,18 @@ resource "kubernetes_network_policy" "aislamiento" {
           }
         }
       }
+
+      # Las subredes del balanceador. No hay pods en ellas, asi que la
+      # separacion entre ambientes se mantiene.
+      dynamic "from" {
+        for_each = toset(var.load_balancer_cidrs)
+
+        content {
+          ip_block {
+            cidr = from.value
+          }
+        }
+      }
     }
   }
 }

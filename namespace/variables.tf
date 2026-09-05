@@ -68,3 +68,9 @@ variable "irsa_role_arn" {
   type        = string
   default     = ""
 }
+
+variable "load_balancer_cidrs" {
+  description = "Rangos desde los que se admite trafico entrante ademas del propio namespace."
+  type        = list(string)
+  default     = []
+}
