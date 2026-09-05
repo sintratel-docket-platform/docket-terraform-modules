@@ -62,3 +62,9 @@ variable "operator_group" {
   type        = string
   default     = ""
 }
+
+variable "irsa_role_arn" {
+  description = "ARN del rol de IAM que puede asumir el ServiceAccount del ambiente. Vacio lo deja sin acceso a AWS."
+  type        = string
+  default     = ""
+}

@@ -67,6 +67,10 @@ resource "kubernetes_service_account" "aplicacion" {
   metadata {
     name      = "docket"
     namespace = kubernetes_namespace.this.metadata[0].name
+
+    annotations = var.irsa_role_arn != "" ? {
+      "eks.amazonaws.com/role-arn" = var.irsa_role_arn
+    } : {}
   }
 
   automount_service_account_token = false
