@@ -1,3 +1,5 @@
+data "aws_default_tags" "current" {}
+
 data "aws_iam_policy_document" "cluster_assume" {
   statement {
     effect  = "Allow"
@@ -108,9 +110,16 @@ resource "aws_launch_template" "nodes" {
     http_put_response_hop_limit = 1
   }
 
+  # Las instancias las crea el grupo de autoescalado, no Terraform, asi que
+  # default_tags no las alcanza y hay que propagarlas por el launch template.
   tag_specifications {
     resource_type = "instance"
-    tags          = { Name = "docket-efimero-nodo" }
+    tags          = merge(data.aws_default_tags.current.tags, { Name = "docket-efimero-nodo" })
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags          = merge(data.aws_default_tags.current.tags, { Name = "docket-efimero-nodo" })
   }
 }
 
