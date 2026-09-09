@@ -1,24 +1,24 @@
-# Módulo `red`
+# `network` module
 
-VPC con subredes públicas y privadas repartidas en dos zonas de disponibilidad, requisito de EKS.
+VPC with public and private subnets spread across two availability zones, an EKS requirement.
 
-Incluye un único NAT Gateway compartido por ambas zonas, decisión de costo registrada en el ADR-005 de la arquitectura. Si cae la zona donde vive el NAT, los nodos de la otra zona pierden la salida a internet.
+Includes a single NAT Gateway shared by both zones, a cost decision recorded in ADR-005 of the architecture. If the zone hosting the NAT fails, nodes in the other zone lose internet egress.
 
-## Entradas
+## Inputs
 
-| Variable | Tipo | Obligatoria | Para qué |
+| Variable | Type | Required | Purpose |
 |---|---|---|---|
-| `vpc_cidr` | string | No, `10.0.0.0/16` | Rango de la VPC |
-| `availability_zones` | list(string) | Sí | Zonas donde se reparten las subredes. Valida que sean al menos dos |
-| `public_subnet_cidrs` | list(string) | Sí | Subredes del balanceador y del NAT |
-| `private_subnet_cidrs` | list(string) | Sí | Subredes de los nodos |
-| `cluster_name` | string | Sí | Etiqueta las subredes para que el AWS Load Balancer Controller las descubra |
-| `single_nat_gateway` | bool | No, `true` | Un NAT compartido en vez de uno por zona |
+| `vpc_cidr` | string | No, `10.0.0.0/16` | VPC range |
+| `availability_zones` | list(string) | Yes | Zones the subnets are spread across. Validates that there are at least two |
+| `public_subnet_cidrs` | list(string) | Yes | Subnets for the load balancer and the NAT |
+| `private_subnet_cidrs` | list(string) | Yes | Subnets for the nodes |
+| `cluster_name` | string | Yes | Tags the subnets so the AWS Load Balancer Controller discovers them |
+| `single_nat_gateway` | bool | No, `true` | One shared NAT instead of one per zone |
 
-## Salidas previstas
+## Outputs
 
-| Output | Qué devuelve | Quién lo consume |
+| Output | What it returns | Who consumes it |
 |---|---|---|
-| `vpc_id` | Identificador de la VPC | El módulo `cluster` |
-| `public_subnet_ids` | Subredes públicas | El módulo `cluster`, para el balanceador |
-| `private_subnet_ids` | Subredes privadas | El módulo `cluster`, para los nodos |
+| `vpc_id` | VPC identifier | The `cluster` module |
+| `public_subnet_ids` | Public subnets | The `cluster` module, for the load balancer |
+| `private_subnet_ids` | Private subnets | The `cluster` module, for the nodes |

@@ -1,20 +1,20 @@
-# Módulo `registro`
+# `registry` module
 
-Un repositorio de ECR por microservicio, con política de ciclo de vida para podar imágenes antiguas.
+One ECR repository per microservice, with a lifecycle policy that prunes old images.
 
-## Entradas
+## Inputs
 
-| Variable | Tipo | Obligatoria | Para qué |
+| Variable | Type | Required | Purpose |
 |---|---|---|---|
-| `service_names` | list(string) | Sí | Un repositorio por cada nombre |
-| `max_image_count` | number | No, `10` | Imágenes que se conservan por repositorio |
-| `scan_on_push` | bool | No, `true` | Escaneo de vulnerabilidades al publicar |
+| `service_names` | list(string) | Yes | One repository per name |
+| `max_image_count` | number | No, `10` | Images retained per repository |
+| `scan_on_push` | bool | No, `true` | Vulnerability scan on publish |
 
-La capa gratuita de ECR cubre 500 MB al mes, así que la poda no es opcional. El escaneo al publicar aporta evidencia para el área de seguridad y no tiene costo en su modalidad básica.
+The ECR free tier covers 500 MB per month, so pruning is not optional. Scanning on push provides evidence for the security area and has no cost in its basic tier.
 
-## Salidas previstas
+## Outputs
 
-| Output | Qué devuelve | Quién lo consume |
+| Output | What it returns | Who consumes it |
 |---|---|---|
-| `repository_urls` | Mapa de servicio a URL del repositorio | Los manifiestos de despliegue y la pipeline |
-| `repository_arns` | Lista de ARN | El módulo `identidad-ci`, para acotar el rol de build |
+| `repository_urls` | Map of service to repository URL | Deployment manifests and the pipeline |
+| `repository_arns` | List of ARNs | The `ci-identity` module, to scope the build role |

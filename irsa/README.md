@@ -1,37 +1,37 @@
-# Módulo `irsa`
+# `irsa` module
 
-Un rol de IAM que solo puede asumir un `ServiceAccount` concreto de un namespace concreto, mediante el proveedor OIDC del clúster.
+An IAM role assumable only by one specific `ServiceAccount` in one specific namespace, through the cluster OIDC provider.
 
-## Entradas
+## Inputs
 
-| Variable | Para qué |
+| Variable | Purpose |
 |---|---|
-| `role_name` | Nombre del rol |
-| `oidc_provider_arn` | Proveedor OIDC del clúster |
-| `oidc_provider_url` | Su URL sin esquema, para las condiciones |
-| `namespace` | Namespace del `ServiceAccount` autorizado |
-| `service_account` | Nombre del `ServiceAccount` autorizado |
-| `policy_name` | Nombre de la política en línea |
-| `policy_json` | Permisos del rol. Vacío si solo lleva gestionadas |
-| `managed_policy_arns` | Políticas gestionadas de AWS que se adjuntan |
+| `role_name` | Role name |
+| `oidc_provider_arn` | Cluster OIDC provider |
+| `oidc_provider_url` | Its URL without the scheme, for the conditions |
+| `namespace` | Namespace of the authorised `ServiceAccount` |
+| `service_account` | Name of the authorised `ServiceAccount` |
+| `policy_name` | Name of the inline policy |
+| `policy_json` | Role permissions. Empty when it only carries managed policies |
+| `managed_policy_arns` | AWS managed policies attached to the role |
 
-## Salidas
+## Outputs
 
-| Output | Qué devuelve |
+| Output | What it returns |
 |---|---|
-| `role_arn` | ARN, para anotar el `ServiceAccount` |
-| `role_name` | Nombre del rol |
+| `role_arn` | ARN, to annotate the `ServiceAccount` |
+| `role_name` | Role name |
 
-## Por qué vive en el stack efímero
+## Why it lives in the ephemeral stack
 
-La política de confianza apunta al proveedor OIDC del clúster, cuya URL contiene un identificador que cambia en cada recreación. Un rol persistente quedaría con la confianza rota tras el primer ciclo de apagado. Ver `CONVENTIONS.md`.
+The trust policy points at the cluster OIDC provider, whose URL contains an identifier that changes on every recreation. A persistent role would be left with broken trust after the first shutdown cycle. See `CONVENTIONS.md`.
 
 ---
 
-La condición sobre `sub` exige el valor exacto `system:serviceaccount:<namespace>:<service_account>`. Sin ella, cualquier `ServiceAccount` del clúster podría asumir el rol, y la separación entre ambientes desaparecería sin que nada lo indicara.
+The condition on `sub` requires the exact value `system:serviceaccount:<namespace>:<service_account>`. Without it, any `ServiceAccount` in the cluster could assume the role, and the separation between environments would disappear with nothing to signal it.
 
-## Política en línea y política gestionada
+## Inline policy and managed policy
 
-Un rol puede llevar una de las dos, o las dos. La política en línea se escribe en `policy_json` y se crea solo si viene con contenido. Las gestionadas se pasan por ARN en `managed_policy_arns`.
+A role may carry either, or both. The inline policy is written in `policy_json` and is created only when that arrives with content. Managed policies are passed by ARN in `managed_policy_arns`.
 
-El driver de EBS es el caso de política gestionada. Usa `AmazonEBSCSIDriverPolicy`, que mantiene AWS, y copiar su JSON al repositorio dejaría una copia que envejece sin avisar.
+The EBS driver is the managed-policy case. It uses `AmazonEBSCSIDriverPolicy`, which AWS maintains, and copying its JSON into the repository would leave a copy that ages without warning.

@@ -1,31 +1,35 @@
-# Módulo `identidad-ci`
+# `ci-identity` module
 
-Proveedor OIDC de GitHub y los dos roles que asume la pipeline.
+GitHub OIDC provider and the two roles the pipeline assumes.
 
-| Rol | Lo asume | Alcance |
+| Role | Assumed by | Scope |
 |---|---|---|
-| `GitHubActionsBuildRole` | El job que construye y publica imágenes | Solo ECR |
-| `GitHubActionsDeployRole` | El job que ejecuta Terraform | EC2, VPC, IAM, S3, EKS y Route 53 |
+| `GitHubActionsBuildRole` | The job that builds and publishes images | ECR only |
+| `GitHubActionsDeployRole` | The job that runs Terraform | EC2, VPC, IAM, S3, EKS and Route 53 |
 
-La separación responde al criterio de accesos limitados según necesidad de la historia `18`. El job de build no tiene por qué poder crear clústeres.
+The separation answers the least-privilege criterion of card `18`. The build job has no business creating clusters.
 
-## Entradas
+## Inputs
 
-| Variable | Tipo | Obligatoria | Para qué |
+| Variable | Type | Required | Purpose |
 |---|---|---|---|
-| `github_org` | string | Sí | Organización de los repositorios |
-| `build_repositories` | list(string) | Sí | Repositorios que pueden asumir el rol de build |
-| `infra_repository` | string | Sí | Único repositorio que puede asumir el rol de Terraform |
-| `allowed_branches` | list(string) | No, `["main"]` | Ramas admitidas en la política de confianza |
-| `ecr_repository_arns` | list(string) | Sí | Repositorios sobre los que actúa el rol de build |
-| `state_bucket_arn` | string | Sí | Bucket que el rol de Terraform necesita leer y escribir |
+| `github_org` | string | Yes | Organisation owning the repositories |
+| `build_repositories` | list(string) | Yes | Repositories allowed to assume the build role |
+| `infra_repository` | string | Yes | The only repository allowed to assume the Terraform role |
+| `allowed_branches` | list(string) | No, `["main"]` | Branches accepted by the trust policy |
+| `ecr_repository_arns` | list(string) | Yes | Repositories the build role acts on |
+| `state_bucket_arn` | string | Yes | Bucket the Terraform role needs to read and write |
 
-La política de confianza se construye con una condición sobre `sub` del tipo `repo:<org>/<repo>:ref:refs/heads/<rama>`. Sin acotar repositorio y rama, el rol queda asumible por cualquier repositorio de la organización.
+The trust policy is built with a condition on `sub` of the form `repo:<org>@<org_id>/<repo>@<repo_id>:ref:refs/heads/<branch>`. GitHub issues the subject in this immutable form, with numeric identifiers. Without scoping repository and branch, the role would be assumable by any repository in the organisation.
 
-## Salidas previstas
+## Outputs
 
-| Output | Qué devuelve | Quién lo consume |
+| Output | What it returns | Who consumes it |
 |---|---|---|
-| `build_role_arn` | ARN del rol de build | El workflow de construcción de imágenes |
-| `deploy_role_arn` | ARN del rol de Terraform | El workflow de infraestructura |
-| `oidc_provider_arn` | Proveedor OIDC de GitHub | Referencia para políticas adicionales |
+| `build_role_arn` | Build role ARN | The image build workflow |
+| `deploy_role_arn` | Terraform role ARN | The infrastructure workflow |
+| `oidc_provider_arn` | GitHub OIDC provider | Reference for additional policies |
+
+## Scoped policy candidates
+
+`GitHubActionsDeployRole` still carries the broad policy. A scoped candidate and a plan-only role exist alongside it, unattached, pending a full CloudTrail-backed apply and teardown cycle to confirm the action set. See `docs/IAM-POLICY-VALIDATION.md`.

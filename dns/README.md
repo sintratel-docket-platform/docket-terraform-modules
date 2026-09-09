@@ -1,13 +1,13 @@
-# Módulo `dns`
+# `dns` module
 
-Zona alojada de Route 53 y certificado de ACM para los tres ambientes.
+Route 53 hosted zone and ACM certificate for the three environments.
 
-El certificado cubre el host de producción más un comodín que abarca `staging` y `dev`, y cualquier ambiente que se añada después.
+The certificate covers the production host plus a wildcard that spans `staging` and `dev`, and any environment added later.
 
-## Activación en dos pasos
+## Two-step activation
 
-La validación del certificado exige que los nameservers ya estén delegados en el registrador, y esa delegación es un paso manual con latencia de propagación. Por eso `validate_certificate` está separada:
+Certificate validation requires the nameservers to be delegated at the registrar already, and that delegation is a manual step with propagation latency. That is why `validate_certificate` is separate:
 
-1. `apply` con `validate_certificate = false`. Crea la zona y el certificado, que queda en estado pendiente.
-2. Delegar en el registrador los nameservers del output `name_servers`.
-3. `apply` con `validate_certificate = true`. Espera a que ACM complete la validación.
+1. `apply` with `validate_certificate = false`. Creates the zone and the certificate, which stays pending.
+2. Delegate the nameservers from the `name_servers` output at the registrar.
+3. `apply` with `validate_certificate = true`. Waits for ACM to complete validation.

@@ -1,15 +1,15 @@
-# Módulos
+# Modules
 
-Código reutilizable. Un módulo describe **qué** recursos componen una pieza de la plataforma, y los stacks deciden **con qué valores** se instancia.
+Reusable code. A module describes **which** resources make up one piece of the platform; the stacks decide **with which values** it is instantiated.
 
-Ningún módulo declara `provider` ni `backend`. Ambas cosas son responsabilidad del stack que lo consume.
+No module declares `provider` or `backend`. Both are the responsibility of the stack that consumes it.
 
-| Módulo | Responsabilidad |
+| Module | Responsibility |
 |---|---|
-| `red/` | VPC, subredes, Internet Gateway, NAT Gateway, tablas de ruta y security groups |
-| `cluster/` | Clúster EKS, node group, add-ons, proveedor OIDC y access entries |
-| `namespace/` | Un ambiente dentro del clúster: namespace, cuotas, RBAC y políticas de red |
-| `irsa/` | Rol de IAM asumible por un `ServiceAccount` concreto de un namespace concreto |
-| `registro/` | Repositorios de ECR y su política de ciclo de vida |
-| `identidad-ci/` | Proveedor OIDC de GitHub y los roles que asume la pipeline |
-| `ambiente/` | Árbol de parámetros en SSM de un ambiente |
+| `network/` | VPC, subnets, Internet Gateway, NAT Gateway, route tables and security groups |
+| `cluster/` | EKS cluster, node group, add-ons, OIDC provider and access entries |
+| `namespace/` | One environment inside the cluster: namespace, quotas, RBAC and network policies |
+| `irsa/` | IAM role assumable by one specific `ServiceAccount` in one specific namespace |
+| `registry/` | ECR repositories and their lifecycle policy |
+| `ci-identity/` | GitHub OIDC provider and the roles the pipeline assumes |
+| `environment/` | SSM parameter tree for one environment |
