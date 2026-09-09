@@ -1,36 +1,36 @@
 variable "vpc_cidr" {
-  description = "Rango de direcciones de la VPC."
+  description = "Address range of the VPC."
   type        = string
   default     = "10.0.0.0/16"
 }
 
 variable "availability_zones" {
-  description = "Zonas de disponibilidad donde se reparten las subredes. EKS exige al menos dos."
+  description = "Availability zones the subnets are spread across. EKS requires at least two."
   type        = list(string)
 
   validation {
     condition     = length(var.availability_zones) >= 2
-    error_message = "EKS requiere subredes en al menos dos zonas de disponibilidad."
+    error_message = "EKS requires subnets in at least two availability zones."
   }
 }
 
 variable "public_subnet_cidrs" {
-  description = "Rangos de las subredes públicas, una por zona. Alojan el balanceador y el NAT Gateway."
+  description = "Ranges of the public subnets, one per zone. They host the load balancer and the NAT Gateway."
   type        = list(string)
 }
 
 variable "private_subnet_cidrs" {
-  description = "Rangos de las subredes privadas, una por zona. Alojan los nodos del clúster."
+  description = "Ranges of the private subnets, one per zone. They host the cluster nodes."
   type        = list(string)
 }
 
 variable "cluster_name" {
-  description = "Nombre del clúster de EKS. Las subredes se etiquetan con él para que el AWS Load Balancer Controller pueda descubrirlas."
+  description = "Name of the EKS cluster. Subnets are tagged with it so the AWS Load Balancer Controller can discover them."
   type        = string
 }
 
 variable "single_nat_gateway" {
-  description = "Si es cierto, despliega un único NAT Gateway compartido por todas las zonas. Ahorra costo a cambio de perder la salida a internet de una zona si cae la zona del NAT."
+  description = "When true, deploys a single NAT Gateway shared by every zone. Saves cost at the price of losing internet egress for one zone if the NAT zone fails."
   type        = bool
   default     = true
 }

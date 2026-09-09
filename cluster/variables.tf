@@ -1,49 +1,49 @@
 variable "cluster_name" {
-  description = "Nombre del clúster de EKS."
+  description = "Name of the EKS cluster."
   type        = string
 }
 
 variable "kubernetes_version" {
-  description = "Versión de Kubernetes del plano de control."
+  description = "Kubernetes version of the control plane."
   type        = string
 }
 
 variable "private_subnet_ids" {
-  description = "Subredes privadas donde se colocan los nodos."
+  description = "Private subnets where the nodes are placed."
   type        = list(string)
 }
 
 variable "public_subnet_ids" {
-  description = "Subredes públicas donde el AWS Load Balancer Controller crea el balanceador."
+  description = "Public subnets where the AWS Load Balancer Controller creates the load balancer."
   type        = list(string)
 }
 
 variable "node_instance_type" {
-  description = "Tipo de instancia de los nodos. El límite de pods por nodo depende de este valor, y t3.small no alcanza para los tres ambientes."
+  description = "Node instance type. The pod limit per node derives from this value, and t3.small is not enough for the three environments."
   type        = string
   default     = "t3.medium"
 }
 
 variable "node_desired_size" {
-  description = "Número de nodos con los que arranca el node group."
+  description = "Number of nodes the node group starts with."
   type        = number
   default     = 2
 }
 
 variable "node_min_size" {
-  description = "Número mínimo de nodos del node group."
+  description = "Minimum number of nodes in the node group."
   type        = number
   default     = 2
 }
 
 variable "node_max_size" {
-  description = "Número máximo de nodos del node group."
+  description = "Maximum number of nodes in the node group."
   type        = number
   default     = 3
 }
 
 variable "node_disk_size" {
-  description = "Tamaño en GB del volumen de cada nodo."
+  description = "Size in GB of each node volume."
   type        = number
   default     = 20
 }
@@ -65,23 +65,23 @@ variable "enabled_log_types" {
 }
 
 variable "oidc_thumbprints" {
-  description = "Huellas del certificado del emisor OIDC del cluster."
+  description = "Certificate thumbprints of the cluster OIDC issuer."
   type        = list(string)
   default     = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
 }
 
 variable "node_security_group_id" {
-  description = "Security group de los nodos, creado por el modulo de red."
+  description = "Node security group, created by the network module."
   type        = string
 }
 
 variable "node_capacity_type" {
-  description = "ON_DEMAND o SPOT. El tipo de capacidad de los nodos."
+  description = "ON_DEMAND or SPOT. Capacity type of the nodes."
   type        = string
   default     = "ON_DEMAND"
 }
 
 variable "cluster_admin_principals" {
-  description = "ARNs de IAM que reciben administracion del cluster."
+  description = "IAM ARNs granted administrative access to the cluster."
   type        = list(string)
 }

@@ -1,10 +1,10 @@
 variable "environment" {
-  description = "Nombre del ambiente. Determina el prefijo del árbol de parámetros."
+  description = "Environment name. Determines the prefix of the parameter tree."
   type        = string
 
   validation {
     condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "El ambiente debe ser dev, staging o prod."
+    error_message = "The environment must be dev, staging or prod."
   }
 }
 
@@ -26,7 +26,7 @@ variable "parameter_values" {
 }
 
 variable "kms_key_id" {
-  description = "Clave de KMS con la que se cifran los parámetros. Si se deja vacío, SSM usa la clave gestionada por AWS, que no tiene costo."
+  description = "KMS key used to encrypt the parameters. Left empty, SSM uses the AWS-managed key, which has no cost."
   type        = string
   default     = ""
 }

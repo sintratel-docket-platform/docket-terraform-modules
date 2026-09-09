@@ -5,7 +5,7 @@ locals {
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
-  enable_dns_hostnames = true # EKS lo exige para resolver los endpoints del clúster
+  enable_dns_hostnames = true # EKS requires it to resolve the cluster endpoints
 
   tags = { Name = "docket-efimero-vpc" }
 }
