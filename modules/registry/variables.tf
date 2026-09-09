@@ -24,3 +24,14 @@ variable "scan_on_push" {
   type        = bool
   default     = true
 }
+
+variable "image_tag_mutability" {
+  description = "Whether published tags can be overwritten. IMMUTABLE is what a GitOps promotion flow requires."
+  type        = string
+  default     = "IMMUTABLE"
+
+  validation {
+    condition     = contains(["IMMUTABLE", "MUTABLE"], var.image_tag_mutability)
+    error_message = "Must be IMMUTABLE or MUTABLE."
+  }
+}

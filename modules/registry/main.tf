@@ -3,8 +3,11 @@ resource "aws_ecr_repository" "this" {
 
   name = "${var.name_prefix}/${each.value}"
 
-  # Required by the GitOps flow. See environments.md in docket-architecture.
-  image_tag_mutability = "IMMUTABLE"
+  # A GitOps flow needs immutable tags: with a tag that gets rewritten the
+  # manifest does not change, so nothing detects the new image and promotion
+  # between environments stops working. Configurable because a consumer outside
+  # that flow may legitimately want otherwise; the default keeps it safe.
+  image_tag_mutability = var.image_tag_mutability
 
   image_scanning_configuration {
     scan_on_push = var.scan_on_push
