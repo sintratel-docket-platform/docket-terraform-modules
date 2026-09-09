@@ -49,15 +49,19 @@ variable "node_disk_size" {
 }
 
 variable "public_access_cidrs" {
-  description = "Rangos desde los que se admite llegar al endpoint publico de la API."
+  description = "CIDR ranges allowed to reach the public EKS API endpoint."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
+
+  validation {
+    condition     = length(var.public_access_cidrs) > 0 && !contains(var.public_access_cidrs, "0.0.0.0/0")
+    error_message = "Provide at least one explicit CIDR; 0.0.0.0/0 is not allowed."
+  }
 }
 
 variable "enabled_log_types" {
-  description = "Registros del plano de control enviados a CloudWatch."
+  description = "EKS control-plane log types sent to CloudWatch."
   type        = list(string)
-  default     = []
+  default     = ["audit", "authenticator"]
 }
 
 variable "oidc_thumbprints" {
