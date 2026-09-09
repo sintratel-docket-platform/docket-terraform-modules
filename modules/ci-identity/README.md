@@ -27,7 +27,7 @@ The separation answers the least-privilege criterion of card `18`. The build job
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.63.0 |
 
 ## Modules
 
@@ -78,4 +78,5 @@ No modules.
 | <a name="output_deploy_scoped_candidate_policy_arn"></a> [deploy\_scoped\_candidate\_policy\_arn](#output\_deploy\_scoped\_candidate\_policy\_arn) | Unattached scoped policy candidate that requires CloudTrail validation before use. |
 | <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | GitHub OIDC provider, one per account. |
 | <a name="output_plan_candidate_role_arn"></a> [plan\_candidate\_role\_arn](#output\_plan\_candidate\_role\_arn) | Plan-only role candidate that requires a complete plan validation before workflow use. |
+| <a name="output_trusted_subjects"></a> [trusted\_subjects](#output\_trusted\_subjects) | Every OIDC subject the roles in this module trust, as build and deploy.<br/>Exposed because this is the whole authorisation boundary for CI: without<br/>it the only way to review what a workflow may assume is to read a rendered<br/>IAM policy after an apply. Contains no secret; the subjects are public<br/>facts about the repositories. |
 <!-- END_TF_DOCS -->

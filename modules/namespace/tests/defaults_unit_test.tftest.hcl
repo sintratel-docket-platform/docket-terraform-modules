@@ -40,7 +40,7 @@ run "all_four_isolation_layers_are_created" {
   }
 
   assert {
-    condition     = kubernetes_network_policy.aislamiento.metadata[0].name != ""
+    condition     = kubernetes_network_policy.isolation.metadata[0].name != ""
     error_message = "The NetworkPolicy is missing. Without it any namespace reaches any other."
   }
 }

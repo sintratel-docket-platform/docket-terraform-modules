@@ -6,7 +6,7 @@ An IAM role assumable only by one specific `ServiceAccount` in one specific name
 
 ## Why it lives in the ephemeral stack
 
-The trust policy points at the cluster OIDC provider, whose URL contains an identifier that changes on every recreation. A persistent role would be left with broken trust after the first shutdown cycle. See `CONVENTIONS.md`.
+The trust policy points at the cluster OIDC provider, whose URL contains an identifier that changes on every recreation. A persistent role would be left with broken trust after the first shutdown cycle. See `AGENTS.md`.
 
 ---
 
@@ -30,7 +30,7 @@ The EBS driver is the managed-policy case. It uses `AmazonEBSCSIDriverPolicy`, w
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.63.0 |
 
 ## Modules
 

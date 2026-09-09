@@ -1,18 +1,18 @@
 locals {
   # GitHub issues the subject in immutable form, with the numeric identifier of
-  # the organisation and of the repository. See CONVENTIONS.md.
+  # the organisation and of the repository. See AGENTS.md.
   org = "${var.github_org}@${var.github_org_id}"
 
   build_subjects = flatten([
     for repo in var.build_repositories : [
-      for rama in var.allowed_branches :
-      "repo:${local.org}/${repo}@${var.repository_ids[repo]}:ref:refs/heads/${rama}"
+      for branch in var.allowed_branches :
+      "repo:${local.org}/${repo}@${var.repository_ids[repo]}:ref:refs/heads/${branch}"
     ]
   ])
 
   infra_subjects = [
-    for rama in var.allowed_branches :
-    "repo:${local.org}/${var.infra_repository}@${var.repository_ids[var.infra_repository]}:ref:refs/heads/${rama}"
+    for branch in var.allowed_branches :
+    "repo:${local.org}/${var.infra_repository}@${var.repository_ids[var.infra_repository]}:ref:refs/heads/${branch}"
   ]
 }
 

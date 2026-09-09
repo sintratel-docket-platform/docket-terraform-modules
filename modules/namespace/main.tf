@@ -136,9 +136,9 @@ resource "kubernetes_role_binding" "operador" {
   }
 }
 
-resource "kubernetes_network_policy" "aislamiento" {
+resource "kubernetes_network_policy" "isolation" {
   metadata {
-    name      = "aislamiento-por-ambiente"
+    name      = "isolate-by-environment"
     namespace = kubernetes_namespace.this.metadata[0].name
   }
 

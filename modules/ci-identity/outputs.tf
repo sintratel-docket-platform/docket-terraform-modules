@@ -22,3 +22,17 @@ output "plan_candidate_role_arn" {
   description = "Plan-only role candidate that requires a complete plan validation before workflow use."
   value       = aws_iam_role.plan_candidate.arn
 }
+
+output "trusted_subjects" {
+  description = <<-EOT
+    Every OIDC subject the roles in this module trust, as build and deploy.
+    Exposed because this is the whole authorisation boundary for CI: without
+    it the only way to review what a workflow may assume is to read a rendered
+    IAM policy after an apply. Contains no secret; the subjects are public
+    facts about the repositories.
+  EOT
+  value = {
+    build  = local.build_subjects
+    deploy = local.infra_subjects
+  }
+}
