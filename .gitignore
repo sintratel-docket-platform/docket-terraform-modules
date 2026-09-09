@@ -1,0 +1,18 @@
+# Terraform working directories
+**/.terraform/*
+.terraform.tfstate.lock.info
+
+# State files: modules have none, but a stray init must never be committed
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Variables and saved plans
+*.tfvars
+*.tfvars.json
+*.tfplan
+
+# Lock files belong to root modules. A child module has no root to bind to,
+# and a committed one drifts from whichever stack consumes it.
+**/.terraform.lock.hcl
