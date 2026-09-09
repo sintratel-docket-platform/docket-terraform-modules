@@ -21,7 +21,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = var.thumbprints
 
-  tags = { Name = "docket-github-oidc" }
+  tags = { Name = "${var.name_prefix}-github-oidc" }
 }
 
 # ---------- Build role: ECR only ----------

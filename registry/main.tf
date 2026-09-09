@@ -1,7 +1,7 @@
 resource "aws_ecr_repository" "this" {
   for_each = toset(var.service_names)
 
-  name = "docket/${each.value}"
+  name = "${var.name_prefix}/${each.value}"
 
   # Required by the GitOps flow. See environments.md in docket-architecture.
   image_tag_mutability = "IMMUTABLE"
@@ -10,7 +10,7 @@ resource "aws_ecr_repository" "this" {
     scan_on_push = var.scan_on_push
   }
 
-  tags = { Name = "docket-${each.value}" }
+  tags = { Name = "${var.name_prefix}-${each.value}" }
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {

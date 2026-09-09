@@ -1,3 +1,13 @@
+variable "name_prefix" {
+  description = "Prefix for every resource name this module creates. Keeps the module reusable: it names nothing after a particular project."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9-]*$", var.name_prefix))
+    error_message = "The prefix must be lowercase alphanumeric, optionally hyphen separated."
+  }
+}
+
 variable "service_names" {
   description = "Microservice names. One ECR repository is created per name."
   type        = list(string)

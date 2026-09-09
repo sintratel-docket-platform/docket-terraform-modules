@@ -13,10 +13,10 @@ data "aws_iam_policy_document" "cluster_assume" {
 }
 
 resource "aws_iam_role" "cluster" {
-  name               = "docket-efimero-plano-control"
+  name               = "${var.name_prefix}-plano-control"
   assume_role_policy = data.aws_iam_policy_document.cluster_assume.json
 
-  tags = { Name = "docket-efimero-plano-control" }
+  tags = { Name = "${var.name_prefix}-plano-control" }
 }
 
 resource "aws_iam_role_policy_attachment" "cluster" {
@@ -66,10 +66,10 @@ data "aws_iam_policy_document" "nodes_assume" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name               = "docket-efimero-nodos"
+  name               = "${var.name_prefix}-nodos"
   assume_role_policy = data.aws_iam_policy_document.nodes_assume.json
 
-  tags = { Name = "docket-efimero-nodos" }
+  tags = { Name = "${var.name_prefix}-nodos" }
 }
 
 resource "aws_iam_role_policy_attachment" "nodes" {
@@ -84,7 +84,7 @@ resource "aws_iam_role_policy_attachment" "nodes" {
 }
 
 resource "aws_launch_template" "nodes" {
-  name_prefix = "docket-efimero-nodos-"
+  name_prefix = "${var.name_prefix}-nodos-"
 
   # The network one carries the load balancer rule; the cluster one carries the
   # control plane route to the kubelet.
@@ -114,18 +114,18 @@ resource "aws_launch_template" "nodes" {
   # default_tags does not reach them and they must be propagated by the launch template.
   tag_specifications {
     resource_type = "instance"
-    tags          = merge(data.aws_default_tags.current.tags, { Name = "docket-efimero-nodo" })
+    tags          = merge(data.aws_default_tags.current.tags, { Name = "${var.name_prefix}-nodo" })
   }
 
   tag_specifications {
     resource_type = "volume"
-    tags          = merge(data.aws_default_tags.current.tags, { Name = "docket-efimero-nodo" })
+    tags          = merge(data.aws_default_tags.current.tags, { Name = "${var.name_prefix}-nodo" })
   }
 }
 
 resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
-  node_group_name = "docket-efimero-nodos"
+  node_group_name = "${var.name_prefix}-nodos"
   node_role_arn   = aws_iam_role.nodes.arn
   subnet_ids      = var.private_subnet_ids
 
@@ -175,7 +175,7 @@ resource "aws_eks_addon" "vpc_cni" {
     }
   })
 
-  tags = { Name = "docket-efimero-vpc-cni" }
+  tags = { Name = "${var.name_prefix}-vpc-cni" }
 }
 
 resource "aws_eks_addon" "otros" {
@@ -190,7 +190,7 @@ resource "aws_eks_addon" "otros" {
 
   depends_on = [aws_eks_node_group.this]
 
-  tags = { Name = "docket-efimero-${each.value}" }
+  tags = { Name = "${var.name_prefix}-${each.value}" }
 }
 
 resource "aws_eks_access_entry" "admin" {

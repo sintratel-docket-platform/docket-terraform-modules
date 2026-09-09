@@ -1,3 +1,13 @@
+variable "name_prefix" {
+  description = "Prefix for every resource name this module creates. Keeps the module reusable: it names nothing after a particular project."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9-]*$", var.name_prefix))
+    error_message = "The prefix must be lowercase alphanumeric, optionally hyphen separated."
+  }
+}
+
 variable "domain_name" {
   description = "Domain registered with the external registrar."
   type        = string
@@ -6,7 +16,6 @@ variable "domain_name" {
 variable "subdomain" {
   description = "Subdomain the environments hang from."
   type        = string
-  default     = "docket"
 }
 
 variable "validate_certificate" {

@@ -5,7 +5,7 @@ locals {
 resource "aws_route53_zone" "this" {
   name = var.domain_name
 
-  tags = { Name = "docket-${var.domain_name}" }
+  tags = { Name = "${var.name_prefix}-${var.domain_name}" }
 }
 
 # One certificate for the production host and a wildcard covering the other environments.
@@ -18,7 +18,7 @@ resource "aws_acm_certificate" "this" {
     create_before_destroy = true
   }
 
-  tags = { Name = "docket-${local.host_prod}" }
+  tags = { Name = "${var.name_prefix}-${local.host_prod}" }
 }
 
 resource "aws_route53_record" "validation" {

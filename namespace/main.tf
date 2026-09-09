@@ -3,7 +3,7 @@ resource "kubernetes_namespace" "this" {
     name = var.environment
 
     labels = {
-      "app.kubernetes.io/part-of" = "docket"
+      "app.kubernetes.io/part-of" = var.part_of
 
       # enforce rejects the pod; warn admits it and reports what it lacks.
       "pod-security.kubernetes.io/enforce" = var.pod_security_enforce
@@ -60,12 +60,12 @@ resource "kubernetes_limit_range" "this" {
 }
 
 locals {
-  operator_group = var.operator_group != "" ? var.operator_group : "docket:${var.environment}"
+  operator_group = var.operator_group != "" ? var.operator_group : "${var.part_of}:${var.environment}"
 }
 
 resource "kubernetes_service_account" "aplicacion" {
   metadata {
-    name      = "docket"
+    name      = var.service_account_name
     namespace = kubernetes_namespace.this.metadata[0].name
 
     annotations = var.irsa_role_arn != "" ? {

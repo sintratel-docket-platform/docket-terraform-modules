@@ -7,5 +7,5 @@ resource "aws_ssm_parameter" "this" {
   value_wo_version = var.parameter_value_versions[each.value]
   key_id           = var.kms_key_id != "" ? var.kms_key_id : null
 
-  tags = { Name = "docket-${var.environment}-${each.value}" }
+  tags = { Name = "${var.name_prefix}-${var.environment}-${each.value}" }
 }

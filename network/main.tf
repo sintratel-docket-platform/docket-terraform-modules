@@ -7,13 +7,13 @@ resource "aws_vpc" "this" {
   enable_dns_support   = true
   enable_dns_hostnames = true # EKS requires it to resolve the cluster endpoints
 
-  tags = { Name = "docket-efimero-vpc" }
+  tags = { Name = "${var.name_prefix}-vpc" }
 }
 
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
-  tags = { Name = "docket-efimero-igw" }
+  tags = { Name = "${var.name_prefix}-igw" }
 }
 
 resource "aws_subnet" "public" {
@@ -25,7 +25,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "docket-efimero-publica-${var.availability_zones[count.index]}"
+    Name = "${var.name_prefix}-publica-${var.availability_zones[count.index]}"
     # The AWS Load Balancer Controller looks for this tag to know where
     # crear un balanceador de cara a internet.
     "kubernetes.io/role/elb"                    = "1"
@@ -41,7 +41,7 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name                                        = "docket-efimero-privada-${var.availability_zones[count.index]}"
+    Name                                        = "${var.name_prefix}-privada-${var.availability_zones[count.index]}"
     "kubernetes.io/role/internal-elb"           = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
@@ -52,7 +52,7 @@ resource "aws_eip" "nat" {
   count  = local.nat_count
   domain = "vpc"
 
-  tags = { Name = "docket-efimero-nat-${count.index}" }
+  tags = { Name = "${var.name_prefix}-nat-${count.index}" }
 }
 
 resource "aws_nat_gateway" "this" {
@@ -61,7 +61,7 @@ resource "aws_nat_gateway" "this" {
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
 
-  tags = { Name = "docket-efimero-nat-${count.index}" }
+  tags = { Name = "${var.name_prefix}-nat-${count.index}" }
 
   depends_on = [aws_internet_gateway.this]
 }
@@ -74,7 +74,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.this.id
   }
 
-  tags = { Name = "docket-efimero-rt-publica" }
+  tags = { Name = "${var.name_prefix}-rt-publica" }
 }
 
 resource "aws_route_table_association" "public" {
@@ -95,7 +95,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.this[var.single_nat_gateway ? 0 : count.index].id
   }
 
-  tags = { Name = "docket-efimero-rt-privada-${var.availability_zones[count.index]}" }
+  tags = { Name = "${var.name_prefix}-rt-privada-${var.availability_zones[count.index]}" }
 }
 
 resource "aws_route_table_association" "private" {
@@ -106,11 +106,11 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_security_group" "alb" {
-  name        = "docket-efimero-alb"
+  name        = "${var.name_prefix}-alb"
   description = "Public ingress on 80 and 443 towards the load balancer"
   vpc_id      = aws_vpc.this.id
 
-  tags = { Name = "docket-efimero-alb" }
+  tags = { Name = "${var.name_prefix}-alb" }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_http" {
@@ -132,11 +132,11 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https" {
 }
 
 resource "aws_security_group" "nodes" {
-  name        = "docket-efimero-nodos"
+  name        = "${var.name_prefix}-nodos"
   description = "Cluster nodes: ingress only from the load balancer and between themselves"
   vpc_id      = aws_vpc.this.id
 
-  tags = { Name = "docket-efimero-nodos" }
+  tags = { Name = "${var.name_prefix}-nodos" }
 }
 
 # Controller ip mode: traffic reaches the container port directly.

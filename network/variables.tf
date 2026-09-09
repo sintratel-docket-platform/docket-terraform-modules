@@ -1,3 +1,13 @@
+variable "name_prefix" {
+  description = "Prefix for every resource name this module creates. Keeps the module reusable: it names nothing after a particular project."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9-]*$", var.name_prefix))
+    error_message = "The prefix must be lowercase alphanumeric, optionally hyphen separated."
+  }
+}
+
 variable "vpc_cidr" {
   description = "Address range of the VPC."
   type        = string

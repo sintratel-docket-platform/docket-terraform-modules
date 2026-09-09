@@ -1,3 +1,15 @@
+variable "part_of" {
+  description = "Value of the app.kubernetes.io/part-of label, and the prefix of the operator group."
+  type        = string
+  default     = "docket"
+}
+
+variable "service_account_name" {
+  description = "Name of the workload ServiceAccount. Deployments reference it by this name."
+  type        = string
+  default     = "docket"
+}
+
 variable "environment" {
   description = "Environment name. It is also the namespace name."
   type        = string
