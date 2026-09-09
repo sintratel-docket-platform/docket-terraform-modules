@@ -186,3 +186,30 @@ jobs:
           output-file: README.md
           output-method: inject
           fail-on-diff: true
+
+  rules:
+    name: IaC rules (IAC-01..IAC-24)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      # The twenty-four rules in AGENTS.md section 7.12 were written with a
+      # verification command each, and until now nothing ran them: they were
+      # checkable but never checked. AGENTS.md says a convention that is not
+      # enforced is a suggestion, and that applied to its own rules.
+      #
+      # The script skips a rule whose tool is absent rather than failing, so
+      # what it reports as skipped is the honest gap, not a silent pass.
+      - name: Verify the IaC rules
+        run: |
+          tflint --init
+          bash scripts/verify-iac-rules.sh
