@@ -1,6 +1,6 @@
 locals {
   # GitHub emite el sujeto en forma inmutable, con el identificador de la
-  # organizacion y el del repositorio. Ver CONVENCIONES.md.
+  # organizacion y el del repositorio. Ver CONVENTIONS.md.
   org = "${var.github_org}@${var.github_org_id}"
 
   build_subjects = flatten([

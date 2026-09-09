@@ -41,7 +41,7 @@ La quinta capa vive fuera del clúster: cada rol de IRSA solo lee su prefijo de 
 
 **Sin `LimitRange`, la cuota rompería todo despliegue.** Con una `ResourceQuota` de CPU o memoria activa, un pod que no declare `resources` es **rechazado**. : el sistema de cuotas no puede contabilizar lo que no sabe cuánto pide. El `LimitRange` actúa antes, rellena los valores por defecto, y el pod llega a la cuota con números.
 
-**La cuota incluye `services.loadbalancers` y `persistentvolumeclaims`.** Son control de coste. Los crea un controlador dentro del clúster y Terraform no los ve, que es la definición de los huérfanos que busca `scripts/verificar-huerfanos.sh`. Un tope es la única barrera contra un manifiesto
+**La cuota incluye `services.loadbalancers` y `persistentvolumeclaims`.** Son control de coste. Los crea un controlador dentro del clúster y Terraform no los ve, que es la definición de los huérfanos que busca `scripts/check-orphans.sh`. Un tope es la única barrera contra un manifiesto
 que levante veinte balanceadores.
 
 **El `Role` no concede `secrets`.** Un operador que puede leer secretos tiene el `JWT_SECRET` del ambiente, y a partir de ahí el resto del RBAC deja de importar. Los secretos se consultan en SSM, donde el permiso lo controla IAM.

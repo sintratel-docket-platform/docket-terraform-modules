@@ -47,7 +47,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Van juntos para que Terraform los destruya a la vez. Ver CONVENCIONES.md.
+# Van juntos para que Terraform los destruya a la vez. Ver CONVENTIONS.md.
 resource "aws_eip" "nat" {
   count  = local.nat_count
   domain = "vpc"

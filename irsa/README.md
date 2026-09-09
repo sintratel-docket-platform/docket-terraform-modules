@@ -24,7 +24,7 @@ Un rol de IAM que solo puede asumir un `ServiceAccount` concreto de un namespace
 
 ## Por qué vive en el stack efímero
 
-La política de confianza apunta al proveedor OIDC del clúster, cuya URL contiene un identificador que cambia en cada recreación. Un rol persistente quedaría con la confianza rota tras el primer ciclo de apagado. Ver `CONVENCIONES.md`.
+La política de confianza apunta al proveedor OIDC del clúster, cuya URL contiene un identificador que cambia en cada recreación. Un rol persistente quedaría con la confianza rota tras el primer ciclo de apagado. Ver `CONVENTIONS.md`.
 
 ---
 
