@@ -19,7 +19,19 @@ This file is the single source of truth for how work is produced in this project
 5. Existing conventions visible in the surrounding code
 6. General best practice
 
-**Distribution.** This file lives at the macro-project root and is copied verbatim into every repository as `AGENTS.md`, with `CLAUDE.md` importing it on its first line (`@AGENTS.md`). It is never edited in a copy — edit the root, then redistribute. A copy that has drifted from the root is a bug.
+**Distribution.** The canonical copy lives in
+[`docket-architecture/standards/AGENTS.md`](https://github.com/sintratel-docket-platform/docket-architecture/blob/main/standards/AGENTS.md)
+and is copied verbatim into every repository, with `CLAUDE.md` importing it on
+its first line (`@AGENTS.md`). It is never edited in a copy — change the source,
+open a pull request, then redistribute. The drift check in each repository's
+`pr-conventions` workflow compares its copy against the source and fails when
+they differ, so a missed redistribution surfaces rather than rots.
+
+An agent reads the `AGENTS.md` of the repository it is in; it does not follow a
+link and does not read organisation-level files. That is why this file is copied
+rather than centralised. `CONTRIBUTING.md`, the pull request template and
+`CODEOWNERS` are centralised, in the organisation's `.github` repository, because
+GitHub applies those by default.
 
 **Maintenance.** Treat this file as a *failure log, not a wishlist*. When an agent makes the same mistake twice, this file is missing a line. Add the line.
 
