@@ -1,58 +1,56 @@
-# Módulo `namespace`
+# `namespace` module
 
-Un ambiente dentro del clúster compartido: su namespace y las cuatro capas que lo separan de los otros dos.
+One environment inside the shared cluster: its namespace and the four layers that separate it from the other two.
 
-## Entradas
+## Inputs
 
-| Variable | Tipo | Obligatoria | Para qué |
+| Variable | Type | Required | Purpose |
 |---|---|---|---|
-| `environment` | string | Sí | Nombre del ambiente y del namespace |
-| `pod_security_enforce` | string | No, `baseline` | Nivel de Pod Security Admission que se rechaza |
-| `quota` | object | No | Techo de consumo del namespace |
-| `container_defaults` | object | No | Valores que recibe un contenedor que no declara `resources` |
-| `allow_exec` | bool | No, `true` | Permite al operador abrir una shell dentro de un pod |
-| `operator_group` | string | No, `docket:<ambiente>` | Grupo de Kubernetes al que se concede el rol de operador |
-| `irsa_role_arn` | string | No, vacío | Rol de IAM que puede asumir el `ServiceAccount` del ambiente |
+| `environment` | string | Yes | Name of the environment and of the namespace |
+| `pod_security_enforce` | string | No, `baseline` | Pod Security Admission level that is rejected |
+| `quota` | object | No | Consumption ceiling of the namespace |
+| `container_defaults` | object | No | Values a container receives when it declares no `resources` |
+| `allow_exec` | bool | No, `true` | Lets the operator open a shell inside a pod |
+| `operator_group` | string | No, `docket:<environment>` | Kubernetes group granted the operator role |
+| `irsa_role_arn` | string | No, empty | IAM role the environment `ServiceAccount` may assume |
 
-## Salidas
+## Outputs
 
-| Output | Qué devuelve |
+| Output | What it returns |
 |---|---|
-| `name` | Nombre del namespace |
+| `name` | Namespace name |
 
-## Por qué un namespace no basta
+## Why a namespace is not enough
 
-Un namespace separa nombres. **No aísla nada por sí solo:** un pod en `dev` puede abrir una conexión a un pod en `prod`, y una credencial con permisos de clúster opera en los tres igual.
+A namespace separates names. **On its own it isolates nothing:** a pod in `dev` can open a connection to a pod in `prod`, and a credential with cluster permissions operates in all three alike.
 
-Lo que aporta es ser la unidad sobre la que se aplican las demás capas. El módulo crea las cuatro, y ninguna basta sola:
+What it provides is the unit the other layers are applied to. The module creates all four, and none is sufficient alone:
 
-| Capa | Objeto | Qué impide |
+| Layer | Object | What it prevents |
 |---|---|---|
-| Nombres | `Namespace` | Que dos ambientes colisionen en el nombre de un recurso |
-| Consumo | `ResourceQuota` y `LimitRange` | Que un ambiente agote los nodos y tumbe a los otros |
-| Permisos | `Role` y `RoleBinding` | Que una credencial de un ambiente opere en otro |
-| Red | `NetworkPolicy` | Que un pod de un ambiente alcance a un pod de otro |
+| Names | `Namespace` | Two environments colliding on a resource name |
+| Consumption | `ResourceQuota` and `LimitRange` | One environment exhausting the nodes and taking down the others |
+| Permissions | `Role` and `RoleBinding` | A credential from one environment operating in another |
+| Network | `NetworkPolicy` | A pod in one environment reaching a pod in another |
 
-La quinta capa vive fuera del clúster: cada rol de IRSA solo lee su prefijo de SSM. La crea el módulo `irsa`, y aquí solo se anota el `ServiceAccount` con su ARN.
+The fifth layer lives outside the cluster: each IRSA role reads only its own SSM prefix. The `irsa` module creates it, and here the `ServiceAccount` is merely annotated with its ARN.
 
 ---
 
-**Las etiquetas del namespace son funcionales.** `pod-security.kubernetes.io/enforce` activa un control incorporado de Kubernetes que rechaza pods según lo que pidan, sin instalar nada. El módulo pone `baseline` en `enforce` y `restricted` en `warn`: `enforce` rechaza el pod, `warn` lo admite y enumera lo que le falta. Los manifiestos de la aplicación declaran ese `securityContext` a partir de la historia `14`, y entonces `enforce` puede subir a `restricted`.
+**The namespace labels are functional.** `pod-security.kubernetes.io/enforce` activates a built-in Kubernetes control that rejects pods based on what they request, with nothing to install. The module sets `baseline` on `enforce` and `restricted` on `warn`: `enforce` rejects the pod, `warn` admits it and enumerates what it lacks. The application manifests declare that `securityContext` from card `14` onward, and `enforce` can then move up to `restricted`.
 
-**Sin `LimitRange`, la cuota rompería todo despliegue.** Con una `ResourceQuota` de CPU o memoria activa, un pod que no declare `resources` es **rechazado**. : el sistema de cuotas no puede contabilizar lo que no sabe cuánto pide. El `LimitRange` actúa antes, rellena los valores por defecto, y el pod llega a la cuota con números.
+**Without a `LimitRange`, the quota would break every deployment.** With a CPU or memory `ResourceQuota` active, a pod that declares no `resources` is **rejected**: the quota system cannot account for something whose request is unknown. The `LimitRange` acts first, fills in the defaults, and the pod reaches the quota with numbers attached.
 
-**La cuota incluye `services.loadbalancers` y `persistentvolumeclaims`.** Son control de coste. Los crea un controlador dentro del clúster y Terraform no los ve, que es la definición de los huérfanos que busca `scripts/check-orphans.sh`. Un tope es la única barrera contra un manifiesto
-que levante veinte balanceadores.
+**The quota includes `services.loadbalancers` and `persistentvolumeclaims`.** These are cost controls. A controller inside the cluster creates them and Terraform never sees them, which is the definition of the orphans `scripts/check-orphans.sh` looks for. A ceiling is the only barrier against a manifest that raises twenty load balancers.
 
-**El `Role` no concede `secrets`.** Un operador que puede leer secretos tiene el `JWT_SECRET` del ambiente, y a partir de ahí el resto del RBAC deja de importar. Los secretos se consultan en SSM, donde el permiso lo controla IAM.
+**The `Role` does not grant `secrets`.** An operator who can read secrets holds the environment `JWT_SECRET`, and from there the rest of the RBAC stops mattering. Secrets are read from SSM, where IAM controls the permission.
 
-**`allow_exec` va cerrado en producción.** Abrir una shell dentro de un pod da sus variables de entorno y sus secretos montados, así que concede por la puerta de atrás lo que la omisión de `secrets` niega por delante.
+**`allow_exec` is closed in production.** Opening a shell inside a pod exposes its environment variables and its mounted secrets, granting through the back door exactly what omitting `secrets` denies at the front.
 
-**El `RoleBinding` apunta a un grupo.** El grupo es el punto donde
-IAM se engancha con Kubernetes: `aws_eks_access_entry` admite `kubernetes_groups`, y una entry con `docket:dev` y sin política asociada deja a esa persona con este `Role` y con nada más.
+**The `RoleBinding` points at a group.** The group is where IAM meets Kubernetes: `aws_eks_access_entry` accepts `kubernetes_groups`, and an entry with `docket:dev` and no attached policy leaves that person with this `Role` and nothing else.
 
-**El `ServiceAccount` no tiene ningún permiso de Kubernetes**, y lleva `automountServiceAccountToken: false`. Los servicios de la aplicación no llaman a la API del clúster, así que ese token solo serviría para ser robado. IRSA no depende de él: el token de AWS lo inyecta un webhook aparte, en otro volumen y con otra audiencia.
+**The `ServiceAccount` holds no Kubernetes permission at all**, and carries `automountServiceAccountToken: false`. The application services do not call the cluster API, so that token would only be useful to steal. IRSA does not depend on it: a separate webhook injects the AWS token, in another volume and with another audience.
 
-**La `NetworkPolicy` solo restringe `Ingress`.** Cerrar `Egress` rompe la resolución de nombres, el acceso a ECR y a SSM, y la petición de credenciales a STS de la que depende IRSA. Con la entrada cerrada el aislamiento se cumple igual, porque quien rechaza la conexión es el destino.
+**The `NetworkPolicy` restricts `Ingress` only.** Closing `Egress` breaks name resolution, access to ECR and SSM, and the STS credential request IRSA depends on. With ingress closed the isolation still holds, because it is the destination that refuses the connection.
 
-El selector de la política usa `kubernetes.io/metadata.name`, una etiqueta que Kubernetes mantiene solo en cada namespace. Por eso el módulo no declara ninguna etiqueta propia para eso.
+The policy selector uses `kubernetes.io/metadata.name`, a label Kubernetes maintains on every namespace by itself. That is why the module declares no label of its own for it.

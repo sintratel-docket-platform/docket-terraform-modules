@@ -1,68 +1,68 @@
-# Módulo `cluster`
+# `cluster` module
 
-Clúster EKS con un node group gestionado, sus add-ons y su proveedor OIDC. Los nodos van en subredes privadas.
+EKS cluster with a managed node group, its add-ons and its OIDC provider. Nodes sit in private subnets.
 
-## Entradas
+## Inputs
 
-| Variable | Tipo | Obligatoria | Para qué |
+| Variable | Type | Required | Purpose |
 |---|---|---|---|
-| `cluster_name` | string | Sí | Nombre del clúster |
-| `kubernetes_version` | string | Sí | Versión del plano de control |
-| `private_subnet_ids` | list(string) | Sí | Dónde van los nodos |
-| `public_subnet_ids` | list(string) | Sí | Dónde se creará el balanceador |
-| `node_security_group_id` | string | Sí | Security group de los nodos, del módulo `red` |
-| `cluster_admin_principals` | list(string) | Sí | ARNs de IAM que reciben administración del clúster |
-| `node_instance_type` | string | No, `t3.medium` | Tipo de instancia de los nodos |
-| `node_capacity_type` | string | No, `ON_DEMAND` | `ON_DEMAND` o `SPOT` |
-| `node_desired_size` | number | No, `2` | Nodos con los que arranca |
-| `node_min_size` | number | No, `2` | Mínimo del node group |
-| `node_max_size` | number | No, `3` | Máximo del node group |
-| `node_disk_size` | number | No, `20` | Volumen de cada nodo, en GB |
-| `public_access_cidrs` | list(string) | No, `0.0.0.0/0` | Desde dónde se admite llegar al endpoint público |
-| `enabled_log_types` | list(string) | No, vacío | Registros del plano de control enviados a CloudWatch |
-| `oidc_thumbprints` | list(string) | No | Huellas del certificado del emisor OIDC |
+| `cluster_name` | string | Yes | Cluster name |
+| `kubernetes_version` | string | Yes | Control plane version |
+| `private_subnet_ids` | list(string) | Yes | Where the nodes go |
+| `public_subnet_ids` | list(string) | Yes | Where the load balancer will be created |
+| `node_security_group_id` | string | Yes | Node security group, from the `network` module |
+| `cluster_admin_principals` | list(string) | Yes | IAM ARNs granted cluster administration |
+| `public_access_cidrs` | list(string) | **Yes** | Ranges allowed to reach the public endpoint. A validation block rejects `0.0.0.0/0` |
+| `node_instance_type` | string | No, `t3.medium` | Node instance type |
+| `node_capacity_type` | string | No, `ON_DEMAND` | `ON_DEMAND` or `SPOT` |
+| `node_desired_size` | number | No, `2` | Nodes it starts with |
+| `node_min_size` | number | No, `2` | Node group minimum |
+| `node_max_size` | number | No, `3` | Node group maximum |
+| `node_disk_size` | number | No, `20` | Volume per node, in GB |
+| `enabled_log_types` | list(string) | No, `["audit", "authenticator"]` | Control plane logs sent to CloudWatch |
+| `oidc_thumbprints` | list(string) | No | OIDC issuer certificate thumbprints |
 
-El valor por defecto de `node_instance_type` **no sirve en esta cuenta**. Ver la sección de tipos de instancia más abajo.
+The default `node_instance_type` **does not work in this account**. See the instance type section below. The ephemeral stack passes `m7i-flex.large`.
 
-## Salidas
+## Outputs
 
-| Output | Qué devuelve | Quién lo consume |
+| Output | What it returns | Who consumes it |
 |---|---|---|
-| `cluster_name` | Nombre del clúster | El teardown y los scripts de operación |
-| `cluster_endpoint` | Endpoint de la API | El proveedor `kubernetes` del stack `plataforma` |
-| `cluster_certificate_authority_data` | Certificado del plano de control | El mismo proveedor |
-| `cluster_security_group_id` | Security group que crea EKS | Reglas hacia el kubelet |
-| `oidc_provider_arn` | Proveedor OIDC del clúster | Los roles de IRSA |
-| `oidc_provider_url` | Su URL sin el esquema | Las condiciones de esas políticas de confianza |
+| `cluster_name` | Cluster name | The teardown and the operations scripts |
+| `cluster_endpoint` | API endpoint | The `kubernetes` provider of the `platform` stack |
+| `cluster_certificate_authority_data` | Control plane certificate | The same provider |
+| `cluster_security_group_id` | Security group EKS creates | Rules towards the kubelet |
+| `oidc_provider_arn` | Cluster OIDC provider | The IRSA roles |
+| `oidc_provider_url` | Its URL without the scheme | The conditions in those trust policies |
 
-`oidc_provider_url` se publica sin `https://` porque ese es el formato en el que se escriben las condiciones de una política de confianza de IRSA.
+`oidc_provider_url` is published without `https://` because that is the format IRSA trust policy conditions are written in.
 
-## Tipos de instancia admitidos en esta cuenta
+## Instance types allowed in this account
 
-La cuenta está en el plan gratuito de AWS, que **solo permite lanzar tipos de instancia elegibles para la capa gratuita**. Un tipo fuera de esa lista hace que `RunInstances` falle en bucle sin que el node group reporte ningún `health.issue`: el síntoma es un `Still creating...` indefinido, y el error solo aparece en CloudTrail.
+The account is on the AWS free plan, which **only allows launching instance types eligible for the free tier**. A type outside that list makes `RunInstances` fail in a loop with the node group reporting no `health.issue`: the symptom is an indefinite `Still creating...`, and the error only appears in CloudTrail.
 
-| Tipo | RAM | Pods por nodo | USD/hora |
+| Type | RAM | Pods per node | USD/hour |
 |---|---|---|---|
-| `t3.small` | 2 GiB | 11 | 0,0208 |
-| `c7i-flex.large` | 4 GiB | 29 | 0,0848 |
-| `m7i-flex.large` | 8 GiB | 29 | 0,0958 |
+| `t3.small` | 2 GiB | 11 | 0.0208 |
+| `c7i-flex.large` | 4 GiB | 29 | 0.0848 |
+| `m7i-flex.large` | 8 GiB | 29 | 0.0958 |
 
-El proyecto usa `c7i-flex.large`. EKS limita los pods por nodo según las interfaces de red del tipo de instancia, y el techo de 11 de `t3.small` no alcanza.
+EKS caps pods per node by the network interfaces of the instance type, and the ceiling of 11 on `t3.small` is not enough for three environments.
 
-## Decisiones que van dentro del módulo
+## Decisions that live inside the module
 
-**`authentication_mode = "API"`.** Retira el ConfigMap `aws-auth`. Quién entra al clúster se declara con `aws_eks_access_entry`, que es un recurso de AWS versionado en el estado, en vez de un objeto editable a mano dentro del propio clúster.
+**`authentication_mode = "API"`.** Retires the `aws-auth` ConfigMap. Who enters the cluster is declared with `aws_eks_access_entry`, an AWS resource versioned in state, rather than an object edited by hand inside the cluster itself.
 
-**`bootstrap_cluster_creator_admin_permissions = false`.** Ningún acceso queda implícito en quien ejecutó el `apply`. Sin al menos un ARN en `cluster_admin_principals`, nadie puede entrar.
+**`bootstrap_cluster_creator_admin_permissions = false`.** No access is implicit for whoever ran the `apply`. Without at least one ARN in `cluster_admin_principals`, nobody gets in.
 
-`aws_eks_node_group` no admite security groups directamente, y sin launch template EKS asocia solo el suyo, con lo que la regla que deja entrar al balanceador no se aplicaría. Y en cuanto el launch template declara alguno, **EKS deja de añadir el suyo**, así que hay que poner los dos: el del módulo `red` y el que crea el clúster. Sin el segundo, el plano de control pierde la ruta hacia el kubelet y se rompen `kubectl logs`, `kubectl exec`, las métricas y los webhooks.
+`aws_eks_node_group` does not accept security groups directly, and without a launch template EKS attaches only its own, so the rule that lets the load balancer in would never apply. And the moment the launch template declares any, **EKS stops adding its own**, so both must be set: the one from the `network` module and the one the cluster creates. Without the second, the control plane loses its route to the kubelet and `kubectl logs`, `kubectl exec`, metrics and webhooks all break.
 
-**IMDSv2 obligatorio con límite de saltos en 1.** Solo el host llega al servicio de metadatos, los pods no. Un pod comprometido no puede pedir las credenciales del nodo, que incluyen lectura de todo el registro. Los pods que necesitan permisos de AWS los obtienen por IRSA, acotados por namespace.
+**IMDSv2 required, hop limit 1.** Only the host reaches the metadata service; pods do not. A compromised pod cannot request the node credentials, which include read access to the whole registry. Pods needing AWS permissions get them through IRSA, scoped by namespace.
 
-**Las etiquetas se propagan por `tag_specifications`.** `default_tags` del proveedor no alcanza a las instancias, porque las crea el grupo de autoescalado y no Terraform. El módulo recoge las etiquetas con el origen de datos `aws_default_tags` en vez de repetirlas, y las aplica a instancias y volúmenes.
+**Tags propagate through `tag_specifications`.** The provider `default_tags` does not reach the instances, because the autoscaling group creates them, not Terraform. The module collects the tags with the `aws_default_tags` data source rather than repeating them, and applies them to instances and volumes.
 
-**`vpc-cni` lleva `enableNetworkPolicy`.** Sin esa clave el CNI acepta las `NetworkPolicy` sin dar ningún error y no las aplica nunca. Es un fallo silencioso: el aislamiento entre ambientes parecería estar puesto sin estarlo.
+**`vpc-cni` carries `enableNetworkPolicy`.** Without that key the CNI accepts `NetworkPolicy` without any error and never enforces it. It is a silent failure: isolation between environments would appear to be in place without being so.
 
-**El orden de los add-ons.** `coredns`, `kube-proxy` y `eks-pod-identity-agent` dependen del node group, porque necesitan un nodo donde correr. `vpc-cni` no puede depender de él: sin CNI ningún nodo llega a `Ready`, y el `depends_on` sería un bloqueo circular.
+**Add-on ordering.** `coredns`, `kube-proxy` and `eks-pod-identity-agent` depend on the node group, because they need a node to run on. `vpc-cni` cannot depend on it: without the CNI no node reaches `Ready`, and the `depends_on` would be a circular block.
 
-**La versión de los add-ons.** El origen de datos `aws_eks_addon_version` devuelve la versión que AWS marca como predeterminada para la versión de Kubernetes del clúster.
+**Add-on versions.** The `aws_eks_addon_version` data source returns the version AWS marks as default for the cluster Kubernetes version.
