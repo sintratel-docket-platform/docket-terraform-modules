@@ -13,3 +13,29 @@ No module declares `provider` or `backend`. Both are the responsibility of the s
 | `registry/` | ECR repositories and their lifecycle policy |
 | `ci-identity/` | GitHub OIDC provider and the roles the pipeline assumes |
 | `environment/` | SSM parameter tree for one environment |
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+No requirements.
+
+## Providers
+
+No providers.
+
+## Modules
+
+No modules.
+
+## Resources
+
+No resources.
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->

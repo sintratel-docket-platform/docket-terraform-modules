@@ -30,7 +30,7 @@ The EBS driver is the managed-policy case. It uses `AmazonEBSCSIDriverPolicy`, w
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.63.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
 
 ## Modules
 
