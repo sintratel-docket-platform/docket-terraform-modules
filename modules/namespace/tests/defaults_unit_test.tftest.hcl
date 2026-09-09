@@ -35,7 +35,7 @@ run "all_four_isolation_layers_are_created" {
   }
 
   assert {
-    condition     = kubernetes_role.operador.metadata[0].name != ""
+    condition     = kubernetes_role.operator.metadata[0].name != ""
     error_message = "The operator Role is missing."
   }
 
@@ -66,7 +66,7 @@ run "the_operator_role_never_grants_secrets" {
   # there the rest of the RBAC stops mattering.
   assert {
     condition = alltrue([
-      for rule in kubernetes_role.operador.rule :
+      for rule in kubernetes_role.operator.rule :
       !contains(rule.resources, "secrets")
     ])
     error_message = "The operator Role must never grant access to secrets."
@@ -85,7 +85,7 @@ run "exec_is_closed_in_production" {
   # back door what omitting `secrets` denies at the front.
   assert {
     condition = alltrue([
-      for rule in kubernetes_role.operador.rule :
+      for rule in kubernetes_role.operator.rule :
       !contains(rule.resources, "pods/exec")
     ])
     error_message = "With allow_exec = false the Role must not grant pods/exec."
@@ -96,7 +96,7 @@ run "service_account_does_not_automount_its_token" {
   command = plan
 
   assert {
-    condition     = kubernetes_service_account.aplicacion.automount_service_account_token == false
+    condition     = kubernetes_service_account.application.automount_service_account_token == false
     error_message = "The application services do not call the cluster API; that token would only be useful to steal."
   }
 }

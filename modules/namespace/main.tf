@@ -14,7 +14,7 @@ resource "kubernetes_namespace" "this" {
 
 resource "kubernetes_resource_quota" "this" {
   metadata {
-    name      = "cuota"
+    name      = "quota"
     namespace = kubernetes_namespace.this.metadata[0].name
   }
 
@@ -33,7 +33,7 @@ resource "kubernetes_resource_quota" "this" {
 
 resource "kubernetes_limit_range" "this" {
   metadata {
-    name      = "limites-por-defecto"
+    name      = "default-limits"
     namespace = kubernetes_namespace.this.metadata[0].name
   }
 
@@ -63,7 +63,7 @@ locals {
   operator_group = var.operator_group != "" ? var.operator_group : "${var.part_of}:${var.environment}"
 }
 
-resource "kubernetes_service_account" "aplicacion" {
+resource "kubernetes_service_account" "application" {
   metadata {
     name      = var.service_account_name
     namespace = kubernetes_namespace.this.metadata[0].name
@@ -76,9 +76,9 @@ resource "kubernetes_service_account" "aplicacion" {
   automount_service_account_token = false
 }
 
-resource "kubernetes_role" "operador" {
+resource "kubernetes_role" "operator" {
   metadata {
-    name      = "operador"
+    name      = "operator"
     namespace = kubernetes_namespace.this.metadata[0].name
   }
 
@@ -117,16 +117,16 @@ resource "kubernetes_role" "operador" {
   }
 }
 
-resource "kubernetes_role_binding" "operador" {
+resource "kubernetes_role_binding" "operator" {
   metadata {
-    name      = "operador"
+    name      = "operator"
     namespace = kubernetes_namespace.this.metadata[0].name
   }
 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
-    name      = kubernetes_role.operador.metadata[0].name
+    name      = kubernetes_role.operator.metadata[0].name
   }
 
   subject {

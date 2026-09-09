@@ -178,7 +178,7 @@ resource "aws_eks_addon" "vpc_cni" {
   tags = { Name = "${var.name_prefix}-vpc-cni" }
 }
 
-resource "aws_eks_addon" "otros" {
+resource "aws_eks_addon" "others" {
   for_each = toset(["coredns", "kube-proxy", "eks-pod-identity-agent"])
 
   cluster_name  = aws_eks_cluster.this.name
