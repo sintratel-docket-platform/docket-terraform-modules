@@ -1,3 +1,8 @@
+variable "account_id" {
+  description = "AWS account that contains the Docket resources."
+  type        = string
+}
+
 variable "github_org" {
   description = "Organización de GitHub que aloja los repositorios del proyecto."
   type        = string
@@ -11,6 +16,11 @@ variable "github_org_id" {
 variable "repository_ids" {
   description = "Identificador numerico de cada repositorio, indexado por nombre."
   type        = map(string)
+}
+
+variable "region" {
+  description = "AWS region that contains the regional Docket resources."
+  type        = string
 }
 
 variable "build_repositories" {
