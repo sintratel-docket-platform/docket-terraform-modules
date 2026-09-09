@@ -1,23 +1,32 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "description": "Keeps the provider and action pins current. The consumer of this repository pins module versions itself, so nothing here bumps a consumer.",
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "prConcurrentLimit": 3,
   "packageRules": [
     {
       "description": "GitHub Actions get their own PR so a supply chain advisory is easy to spot. trivy-action below 0.35.0 was one.",
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "groupName": "github actions"
     },
     {
       "description": "Provider bumps land together; each one changes what terraform validate accepts.",
-      "matchManagers": ["terraform"],
+      "matchManagers": [
+        "terraform"
+      ],
       "groupName": "terraform providers"
     }
   ],
   "vulnerabilityAlerts": {
-    "labels": ["security"],
-    "prPriority": 10
+    "labels": [
+      "security"
+    ]
   }
 }
