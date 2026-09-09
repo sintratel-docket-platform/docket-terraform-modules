@@ -33,5 +33,5 @@ misconfiguration:
 #
 # Record the same justification in the pull request and, when it is an
 # architectural choice rather than a temporary exception, as an ADR.
-#
-# ignorefile: .trivyignore
+
+ignorefile: .trivyignore
