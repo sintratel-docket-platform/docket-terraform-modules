@@ -66,10 +66,10 @@ data "aws_iam_policy_document" "nodes_assume" {
 }
 
 resource "aws_iam_role" "nodes" {
-  name               = "${var.name_prefix}-nodos"
+  name               = "${var.name_prefix}-nodes"
   assume_role_policy = data.aws_iam_policy_document.nodes_assume.json
 
-  tags = { Name = "${var.name_prefix}-nodos" }
+  tags = { Name = "${var.name_prefix}-nodes" }
 }
 
 resource "aws_iam_role_policy_attachment" "nodes" {
@@ -84,7 +84,7 @@ resource "aws_iam_role_policy_attachment" "nodes" {
 }
 
 resource "aws_launch_template" "nodes" {
-  name_prefix = "${var.name_prefix}-nodos-"
+  name_prefix = "${var.name_prefix}-nodes-"
 
   # The network one carries the load balancer rule; the cluster one carries the
   # control plane route to the kubelet.
@@ -125,7 +125,7 @@ resource "aws_launch_template" "nodes" {
 
 resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
-  node_group_name = "${var.name_prefix}-nodos"
+  node_group_name = "${var.name_prefix}-nodes"
   node_role_arn   = aws_iam_role.nodes.arn
   subnet_ids      = var.private_subnet_ids
 

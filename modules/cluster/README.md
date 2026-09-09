@@ -46,7 +46,7 @@ EKS caps pods per node by the network interfaces of the instance type, and the c
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.63.0 |
 
 ## Modules
 

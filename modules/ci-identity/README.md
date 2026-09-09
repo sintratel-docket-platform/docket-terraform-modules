@@ -27,7 +27,7 @@ The separation answers the least-privilege criterion of card `18`. The build job
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.63.0 |
 
 ## Modules
 

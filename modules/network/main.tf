@@ -25,9 +25,9 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.name_prefix}-publica-${var.availability_zones[count.index]}"
+    Name = "${var.name_prefix}-public-${var.availability_zones[count.index]}"
     # The AWS Load Balancer Controller looks for this tag to know where
-    # crear un balanceador de cara a internet.
+    # to create an internet-facing load balancer.
     "kubernetes.io/role/elb"                    = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
@@ -41,7 +41,7 @@ resource "aws_subnet" "private" {
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name                                        = "${var.name_prefix}-privada-${var.availability_zones[count.index]}"
+    Name                                        = "${var.name_prefix}-private-${var.availability_zones[count.index]}"
     "kubernetes.io/role/internal-elb"           = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
@@ -74,7 +74,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.this.id
   }
 
-  tags = { Name = "${var.name_prefix}-rt-publica" }
+  tags = { Name = "${var.name_prefix}-rt-public" }
 }
 
 resource "aws_route_table_association" "public" {
@@ -95,7 +95,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.this[var.single_nat_gateway ? 0 : count.index].id
   }
 
-  tags = { Name = "${var.name_prefix}-rt-privada-${var.availability_zones[count.index]}" }
+  tags = { Name = "${var.name_prefix}-rt-private-${var.availability_zones[count.index]}" }
 }
 
 resource "aws_route_table_association" "private" {
@@ -132,11 +132,11 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https" {
 }
 
 resource "aws_security_group" "nodes" {
-  name        = "${var.name_prefix}-nodos"
+  name        = "${var.name_prefix}-nodes"
   description = "Cluster nodes: ingress only from the load balancer and between themselves"
   vpc_id      = aws_vpc.this.id
 
-  tags = { Name = "${var.name_prefix}-nodos" }
+  tags = { Name = "${var.name_prefix}-nodes" }
 }
 
 # Controller ip mode: traffic reaches the container port directly.

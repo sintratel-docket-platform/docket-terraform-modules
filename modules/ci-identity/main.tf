@@ -84,12 +84,12 @@ resource "aws_iam_role" "build" {
 }
 
 resource "aws_iam_role_policy" "build" {
-  name   = "publicar-en-ecr"
+  name   = "publish-to-ecr"
   role   = aws_iam_role.build.id
   policy = data.aws_iam_policy_document.build_permissions.json
 }
 
-# ---------- Rol de infraestructura: Terraform ----------
+# ---------- Infrastructure role: Terraform ----------
 
 data "aws_iam_policy_document" "deploy_trust" {
   statement {
@@ -508,7 +508,7 @@ resource "aws_iam_role" "deploy" {
 }
 
 resource "aws_iam_role_policy" "deploy" {
-  name   = "provisionar-infraestructura"
+  name   = "provision-infrastructure"
   role   = aws_iam_role.deploy.id
   policy = data.aws_iam_policy_document.deploy_permissions.json
 }
