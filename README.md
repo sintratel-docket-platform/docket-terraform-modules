@@ -64,8 +64,19 @@ the accepted trade-off of a modules monorepo and is fine at this size. If the
 modules start releasing at visibly different cadences, the answer is component
 tags (`network/v1.2.0`), not more repositories.
 
-Releases are cut by `release-please` from Conventional Commits: merging to
-`main` opens a release pull request, and merging that creates the tag.
+Releases are cut by hand today:
+
+```bash
+git tag -a v1.2.0 -m "What changed and why"
+git push origin v1.2.0
+```
+
+`release-please` would do this from the Conventional Commits, and the workflow
+for it is in `.github/workflows/release.yml`, but it cannot run: the
+organisation sets workflow permissions to read-only and forbids Actions from
+creating pull requests, and a repository cannot override that. Enabling it is
+one organisation setting — Settings, Actions, General, Workflow permissions —
+and one line in that file.
 
 ## Working on a module
 

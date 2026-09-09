@@ -176,26 +176,3 @@ jobs:
           output-file: README.md
           output-method: inject
           fail-on-diff: true
-
-  release:
-    name: Release
-    needs: [exposure, static, lint, security, test, docs]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      # Reads Conventional Commits and opens a release pull request that bumps
-      # the version and writes the changelog. Merging it creates the tag that
-      # the live repository pins with ?ref=. This is the same mechanism card
-      # #12 (automatic semantic versioning) needs.
-      #
-      # Tags are repository-wide: v1.2.0 versions all eight modules together.
-      # That is the accepted trade-off of a modules monorepo. If per-module
-      # versioning becomes necessary, switch to component tags and consume
-      # them as ?ref=network/v1.2.0.
-      - uses: googleapis/release-please-action@v4
-        with:
-          release-type: simple
-          token: ${{ secrets.GITHUB_TOKEN }}
