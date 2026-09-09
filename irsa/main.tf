@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Sin esta condicion, cualquier ServiceAccount del cluster podria asumirlo.
+    # Without this condition, any ServiceAccount in the cluster could assume it.
     condition {
       test     = "StringEquals"
       variable = "${var.oidc_provider_url}:sub"
@@ -38,7 +38,7 @@ resource "aws_iam_role_policy" "this" {
   policy = var.policy_json
 }
 
-# Los roles creados antes de que la politica en linea fuera opcional.
+# Roles created before the inline policy became optional.
 moved {
   from = aws_iam_role_policy.this
   to   = aws_iam_role_policy.this[0]

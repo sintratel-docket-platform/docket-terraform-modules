@@ -1,16 +1,16 @@
 variable "domain_name" {
-  description = "Dominio registrado en el registrador externo."
+  description = "Domain registered with the external registrar."
   type        = string
 }
 
 variable "subdomain" {
-  description = "Subdominio bajo el que cuelgan los ambientes."
+  description = "Subdomain the environments hang from."
   type        = string
   default     = "docket"
 }
 
 variable "validate_certificate" {
-  description = "Esperar a que ACM valide el certificado. Requiere que los nameservers ya esten delegados."
+  description = "Wait for ACM to validate the certificate. Requires the nameservers to be delegated already."
   type        = bool
   default     = false
 }

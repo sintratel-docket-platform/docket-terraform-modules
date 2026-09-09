@@ -1,16 +1,16 @@
 variable "environment" {
-  description = "Nombre del ambiente. Es tambien el nombre del namespace."
+  description = "Environment name. It is also the namespace name."
   type        = string
 }
 
 variable "pod_security_enforce" {
-  description = "Nivel de Pod Security Admission que se rechaza."
+  description = "Pod Security Admission level that is rejected."
   type        = string
   default     = "baseline"
 }
 
 variable "quota" {
-  description = "Techo de consumo del namespace."
+  description = "Consumption ceiling of the namespace."
   type = object({
     requests_cpu    = string
     requests_memory = string
@@ -32,7 +32,7 @@ variable "quota" {
 }
 
 variable "container_defaults" {
-  description = "Valores que recibe un contenedor que no declara resources."
+  description = "Values a container receives when it declares no resources."
   type = object({
     default_cpu    = string
     default_memory = string
@@ -52,25 +52,25 @@ variable "container_defaults" {
 }
 
 variable "allow_exec" {
-  description = "Permite al operador abrir una shell dentro de un pod."
+  description = "Allows the operator to open a shell inside a pod."
   type        = bool
   default     = true
 }
 
 variable "operator_group" {
-  description = "Grupo de Kubernetes al que se concede el rol de operador."
+  description = "Kubernetes group granted the operator role."
   type        = string
   default     = ""
 }
 
 variable "irsa_role_arn" {
-  description = "ARN del rol de IAM que puede asumir el ServiceAccount del ambiente. Vacio lo deja sin acceso a AWS."
+  description = "ARN of the IAM role the environment ServiceAccount may assume. Empty leaves it with no AWS access."
   type        = string
   default     = ""
 }
 
 variable "load_balancer_cidrs" {
-  description = "Rangos desde los que se admite trafico entrante ademas del propio namespace."
+  description = "Ranges allowed to send ingress traffic in addition to the namespace itself."
   type        = list(string)
   default     = []
 }

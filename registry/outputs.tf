@@ -1,9 +1,9 @@
 output "repository_urls" {
-  description = "URL de cada repositorio, indexada por nombre de servicio. La consumen los manifiestos y la pipeline."
+  description = "URL of each repository, indexed by service name. Consumed by the manifests and the pipeline."
   value       = { for k, v in aws_ecr_repository.this : k => v.repository_url }
 }
 
 output "repository_arns" {
-  description = "ARN de los repositorios. Los consume el modulo identidad-ci para acotar el rol de build."
+  description = "Repository ARNs. Consumed by the ci-identity module to scope the build role."
   value       = [for r in aws_ecr_repository.this : r.arn]
 }

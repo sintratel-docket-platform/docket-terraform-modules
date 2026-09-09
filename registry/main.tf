@@ -3,7 +3,7 @@ resource "aws_ecr_repository" "this" {
 
   name = "docket/${each.value}"
 
-  # Requisito del flujo GitOps. Ver ambientes.md en docket-architecture.
+  # Required by the GitOps flow. See environments.md in docket-architecture.
   image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
@@ -21,7 +21,7 @@ resource "aws_ecr_lifecycle_policy" "this" {
   policy = jsonencode({
     rules = [{
       rulePriority = 1
-      description  = "Conservar solo las ultimas ${var.max_image_count} imagenes"
+      description  = "Keep only the last ${var.max_image_count} images"
       selection = {
         tagStatus   = "any"
         countType   = "imageCountMoreThan"

@@ -26,7 +26,7 @@ resource "aws_subnet" "public" {
 
   tags = {
     Name = "docket-efimero-publica-${var.availability_zones[count.index]}"
-    # El AWS Load Balancer Controller busca esta etiqueta para saber donde
+    # The AWS Load Balancer Controller looks for this tag to know where
     # crear un balanceador de cara a internet.
     "kubernetes.io/role/elb"                    = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
@@ -47,7 +47,7 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Van juntos para que Terraform los destruya a la vez. Ver CONVENTIONS.md.
+# Kept together so Terraform destroys them at the same time. See CONVENTIONS.md.
 resource "aws_eip" "nat" {
   count  = local.nat_count
   domain = "vpc"
@@ -84,7 +84,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Una tabla por zona, para poder dejar de compartir el NAT sin rehacerlas.
+# One table per zone, so the shared NAT can be dropped without rebuilding them.
 resource "aws_route_table" "private" {
   count = length(var.private_subnet_cidrs)
 
@@ -107,7 +107,7 @@ resource "aws_route_table_association" "private" {
 
 resource "aws_security_group" "alb" {
   name        = "docket-efimero-alb"
-  description = "Entrada publica en 80 y 443 hacia el balanceador"
+  description = "Public ingress on 80 and 443 towards the load balancer"
   vpc_id      = aws_vpc.this.id
 
   tags = { Name = "docket-efimero-alb" }
@@ -115,7 +115,7 @@ resource "aws_security_group" "alb" {
 
 resource "aws_vpc_security_group_ingress_rule" "alb_http" {
   security_group_id = aws_security_group.alb.id
-  description       = "HTTP desde internet"
+  description       = "HTTP from the internet"
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 80
   to_port           = 80
@@ -124,7 +124,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb_http" {
 
 resource "aws_vpc_security_group_ingress_rule" "alb_https" {
   security_group_id = aws_security_group.alb.id
-  description       = "HTTPS desde internet"
+  description       = "HTTPS from the internet"
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 443
   to_port           = 443
@@ -133,37 +133,37 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https" {
 
 resource "aws_security_group" "nodes" {
   name        = "docket-efimero-nodos"
-  description = "Nodos del cluster: entrada solo desde el balanceador y entre ellos"
+  description = "Cluster nodes: ingress only from the load balancer and between themselves"
   vpc_id      = aws_vpc.this.id
 
   tags = { Name = "docket-efimero-nodos" }
 }
 
-# Modo ip del controller: el trafico llega al puerto del contenedor.
+# Controller ip mode: traffic reaches the container port directly.
 resource "aws_vpc_security_group_ingress_rule" "nodes_from_alb" {
   security_group_id            = aws_security_group.nodes.id
-  description                  = "Trafico del balanceador hacia los pods"
+  description                  = "Traffic from the load balancer to the pods"
   referenced_security_group_id = aws_security_group.alb.id
   ip_protocol                  = "-1"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "nodes_from_nodes" {
   security_group_id            = aws_security_group.nodes.id
-  description                  = "Trafico entre nodos del cluster"
+  description                  = "Traffic between cluster nodes"
   referenced_security_group_id = aws_security_group.nodes.id
   ip_protocol                  = "-1"
 }
 
 resource "aws_vpc_security_group_egress_rule" "alb_all" {
   security_group_id = aws_security_group.alb.id
-  description       = "Salida del balanceador"
+  description       = "Load balancer egress"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
 
 resource "aws_vpc_security_group_egress_rule" "nodes_all" {
   security_group_id = aws_security_group.nodes.id
-  description       = "Salida de los nodos, necesaria para ECR, EKS y SSM"
+  description       = "Node egress, required for ECR, EKS and SSM"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }

@@ -1,4 +1,4 @@
 output "name" {
-  description = "Nombre del namespace."
+  description = "Namespace name."
   value       = kubernetes_namespace.this.metadata[0].name
 }

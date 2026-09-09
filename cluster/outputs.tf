@@ -1,29 +1,29 @@
 output "cluster_name" {
-  description = "Nombre del cluster. Lo consumen el teardown y los scripts de operacion."
+  description = "Cluster name. Consumed by the teardown and the operations scripts."
   value       = aws_eks_cluster.this.name
 }
 
 output "cluster_endpoint" {
-  description = "Endpoint de la API. Lo consume el proveedor kubernetes del stack plataforma."
+  description = "API endpoint. Consumed by the kubernetes provider of the platform stack."
   value       = aws_eks_cluster.this.endpoint
 }
 
 output "cluster_certificate_authority_data" {
-  description = "Certificado del plano de control, en base64. Lo consume el proveedor kubernetes para verificar el endpoint."
+  description = "Control plane certificate, base64 encoded. Consumed by the kubernetes provider to verify the endpoint."
   value       = aws_eks_cluster.this.certificate_authority[0].data
 }
 
 output "cluster_security_group_id" {
-  description = "Security group que EKS crea para el cluster. Es el que da ruta al plano de control hacia el kubelet."
+  description = "Security group EKS creates for the cluster. It is what routes the control plane to the kubelet."
   value       = aws_eks_cluster.this.vpc_config[0].cluster_security_group_id
 }
 
 output "oidc_provider_arn" {
-  description = "Proveedor OIDC del cluster. Lo consumen las politicas de confianza de los roles de IRSA."
+  description = "Cluster OIDC provider. Consumed by the trust policies of the IRSA roles."
   value       = aws_iam_openid_connect_provider.cluster.arn
 }
 
 output "oidc_provider_url" {
-  description = "URL del proveedor OIDC sin el esquema. Las condiciones de las politicas de confianza se escriben en ese formato."
+  description = "OIDC provider URL without the scheme. Trust policy conditions are written in that format."
   value       = replace(aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")
 }

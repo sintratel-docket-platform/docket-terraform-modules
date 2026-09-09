@@ -1,42 +1,42 @@
 variable "role_name" {
-  description = "Nombre del rol de IAM."
+  description = "IAM role name."
   type        = string
 }
 
 variable "oidc_provider_arn" {
-  description = "Proveedor OIDC del cluster. Cambia en cada recreacion."
+  description = "Cluster OIDC provider. It changes on every recreation."
   type        = string
 }
 
 variable "oidc_provider_url" {
-  description = "URL del proveedor OIDC sin el esquema, que es el formato en el que se escriben las condiciones."
+  description = "OIDC provider URL without the scheme, which is the format the conditions are written in."
   type        = string
 }
 
 variable "namespace" {
-  description = "Namespace del ServiceAccount autorizado."
+  description = "Namespace of the authorised ServiceAccount."
   type        = string
 }
 
 variable "service_account" {
-  description = "Nombre del ServiceAccount autorizado."
+  description = "Name of the authorised ServiceAccount."
   type        = string
 }
 
 variable "policy_name" {
-  description = "Nombre de la politica en linea del rol."
+  description = "Name of the inline role policy."
   type        = string
   default     = ""
 }
 
 variable "policy_json" {
-  description = "Politica de permisos del rol, en JSON. Vacia si el rol solo lleva politicas gestionadas."
+  description = "Role permission policy, as JSON. Empty when the role only carries managed policies."
   type        = string
   default     = ""
 }
 
 variable "managed_policy_arns" {
-  description = "Politicas gestionadas de AWS que se adjuntan al rol."
+  description = "AWS managed policies attached to the role."
   type        = list(string)
   default     = []
 }

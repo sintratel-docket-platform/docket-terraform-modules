@@ -1,6 +1,6 @@
 locals {
-  # GitHub emite el sujeto en forma inmutable, con el identificador de la
-  # organizacion y el del repositorio. Ver CONVENTIONS.md.
+  # GitHub issues the subject in immutable form, with the numeric identifier of
+  # the organisation and of the repository. See CONVENTIONS.md.
   org = "${var.github_org}@${var.github_org_id}"
 
   build_subjects = flatten([
@@ -24,7 +24,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   tags = { Name = "docket-github-oidc" }
 }
 
-# ---------- Rol de build: solo ECR ----------
+# ---------- Build role: ECR only ----------
 
 data "aws_iam_policy_document" "build_trust" {
   statement {
@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "build_trust" {
 }
 
 data "aws_iam_policy_document" "build_permissions" {
-  # ECR no admite acotar esta accion por recurso.
+  # ECR does not allow scoping this action by resource.
   statement {
     sid       = "AutenticarContraECR"
     effect    = "Allow"
@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "build_permissions" {
 
 resource "aws_iam_role" "build" {
   name               = "GitHubActionsBuildRole"
-  description        = "Publicar imagenes en ECR desde GitHub Actions"
+  description        = "Publish images to ECR from GitHub Actions"
   assume_role_policy = data.aws_iam_policy_document.build_trust.json
 
   tags = { Name = "GitHubActionsBuildRole" }
@@ -501,7 +501,7 @@ resource "aws_iam_role_policy" "plan_candidate" {
 
 resource "aws_iam_role" "deploy" {
   name               = "GitHubActionsDeployRole"
-  description        = "Ejecutar Terraform desde GitHub Actions"
+  description        = "Run Terraform from GitHub Actions"
   assume_role_policy = data.aws_iam_policy_document.deploy_trust.json
 
   tags = { Name = "GitHubActionsDeployRole" }

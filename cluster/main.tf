@@ -43,7 +43,7 @@ resource "aws_eks_cluster" "this" {
 
   enabled_cluster_log_types = var.enabled_log_types
 
-  # Sin esto el cluster puede crearse antes de que el rol tenga su politica.
+  # Without this the cluster can be created before the role has its policy.
   depends_on = [aws_iam_role_policy_attachment.cluster]
 }
 
@@ -86,8 +86,8 @@ resource "aws_iam_role_policy_attachment" "nodes" {
 resource "aws_launch_template" "nodes" {
   name_prefix = "docket-efimero-nodos-"
 
-  # El de la red trae la regla del balanceador; el del cluster, la del plano de
-  # control hacia el kubelet.
+  # The network one carries the load balancer rule; the cluster one carries the
+  # control plane route to the kubelet.
   vpc_security_group_ids = [
     var.node_security_group_id,
     aws_eks_cluster.this.vpc_config[0].cluster_security_group_id,
@@ -110,8 +110,8 @@ resource "aws_launch_template" "nodes" {
     http_put_response_hop_limit = 1
   }
 
-  # Las instancias las crea el grupo de autoescalado, no Terraform, asi que
-  # default_tags no las alcanza y hay que propagarlas por el launch template.
+  # Instances are created by the autoscaling group, not Terraform, so
+  # default_tags does not reach them and they must be propagated by the launch template.
   tag_specifications {
     resource_type = "instance"
     tags          = merge(data.aws_default_tags.current.tags, { Name = "docket-efimero-nodo" })
@@ -167,7 +167,7 @@ resource "aws_eks_addon" "vpc_cni" {
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
 
-  # Sin enableNetworkPolicy el CNI acepta las NetworkPolicy y no las aplica nunca.
+  # Without enableNetworkPolicy the CNI accepts NetworkPolicy and never enforces it.
   configuration_values = jsonencode({
     enableNetworkPolicy = "true"
     nodeAgent = {

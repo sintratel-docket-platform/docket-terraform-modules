@@ -1,10 +1,10 @@
 output "build_role_arn" {
-  description = "Rol que asume el job de construccion de imagenes."
+  description = "Role assumed by the image build job."
   value       = aws_iam_role.build.arn
 }
 
 output "deploy_role_arn" {
-  description = "Rol que asume el job que ejecuta Terraform."
+  description = "Role assumed by the job that runs Terraform."
   value       = aws_iam_role.deploy.arn
 }
 
@@ -14,7 +14,7 @@ output "deploy_scoped_candidate_policy_arn" {
 }
 
 output "oidc_provider_arn" {
-  description = "Proveedor OIDC de GitHub, unico por cuenta."
+  description = "GitHub OIDC provider, one per account."
   value       = aws_iam_openid_connect_provider.github.arn
 }
 

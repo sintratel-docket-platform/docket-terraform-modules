@@ -1,9 +1,9 @@
 output "role_arn" {
-  description = "ARN del rol. Lo consume la anotacion del ServiceAccount en el stack plataforma."
+  description = "Role ARN. Consumed by the ServiceAccount annotation in the platform stack."
   value       = aws_iam_role.this.arn
 }
 
 output "role_name" {
-  description = "Nombre del rol."
+  description = "Role name."
   value       = aws_iam_role.this.name
 }

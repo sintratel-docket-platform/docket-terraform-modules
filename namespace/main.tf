@@ -5,7 +5,7 @@ resource "kubernetes_namespace" "this" {
     labels = {
       "app.kubernetes.io/part-of" = "docket"
 
-      # enforce rechaza el pod; warn lo admite y avisa de lo que le falta.
+      # enforce rejects the pod; warn admits it and reports what it lacks.
       "pod-security.kubernetes.io/enforce" = var.pod_security_enforce
       "pod-security.kubernetes.io/warn"    = "restricted"
     }
@@ -156,8 +156,8 @@ resource "kubernetes_network_policy" "aislamiento" {
         }
       }
 
-      # Las subredes del balanceador. No hay pods en ellas, asi que la
-      # separacion entre ambientes se mantiene.
+      # The load balancer subnets. There are no pods in them, so the
+      # separation between environments still holds.
       dynamic "from" {
         for_each = toset(var.load_balancer_cidrs)
 
