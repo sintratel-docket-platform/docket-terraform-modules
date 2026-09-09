@@ -9,8 +9,20 @@ variable "environment" {
 }
 
 variable "parameter_names" {
-  description = "Nombres de los parámetros que se crean bajo el prefijo del ambiente. El módulo crea la estructura con un valor de marcador, y los valores reales se cargan aparte para que no queden versionados."
+  description = "Parameter names created under the environment prefix."
   type        = list(string)
+}
+
+variable "parameter_value_versions" {
+  description = "Rotation version indexed by parameter name; increment a value to write that parameter again."
+  type        = map(number)
+}
+
+variable "parameter_values" {
+  description = "Write-only values indexed by parameter name."
+  type        = map(string)
+  sensitive   = true
+  ephemeral   = true
 }
 
 variable "kms_key_id" {
