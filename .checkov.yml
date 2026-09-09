@@ -1,0 +1,50 @@
+# Accepted findings stay visible as soft failures rather than being hidden.
+# Owner: Docket platform team
+# Review by: 2026-10-08
+#
+# soft-fail-on rather than skip-check on purpose: the findings still print on
+# every run, so the list has to be defended again each time somebody reads it.
+# Anything not listed here fails the build.
+soft-fail-on:
+  # IAM breadth on GitHubActionsDeployRole. This is finding INFRA-04 and it is
+  # OPEN, not accepted: a scoped policy candidate and a plan-only role already
+  # exist in the module, unattached, waiting on a CloudTrail-backed apply and
+  # teardown cycle to confirm the action set before they replace the broad one.
+  # Shortest review date on this list for that reason.
+  - CKV_AWS_107
+  - CKV_AWS_108
+  - CKV_AWS_109
+  - CKV_AWS_110
+  - CKV_AWS_111
+  - CKV_AWS_356
+  - CKV2_AWS_40
+
+  # EKS topology decided in ADR-003 and ADR-005: one shared cluster, a public
+  # but CIDR-restricted API endpoint, and public subnets carrying the ALB and
+  # the NAT. The module rejects 0.0.0.0/0 with a validation block, and the plan
+  # policy in docket-infrastructure enforces the CIDRs against real values,
+  # which static analysis of a module cannot do.
+  - CKV_AWS_38
+  - CKV_AWS_39
+  - CKV_AWS_260
+  - CKV2_AWS_5
+
+  # Checkov wants every EKS log category. The project enables audit and
+  # authenticator, which is what areas 07 and 08 asked for; the rest bill by
+  # ingested volume on a credit budget.
+  - CKV_AWS_37
+
+  # Customer-managed KMS keys for EKS secret envelope encryption and for ECR.
+  # Both are real hardening, both cost a key per month, and EKS envelope
+  # encryption is a one-way change on an existing cluster. Tracked for card #19
+  # alongside the same finding from Trivy (AWS-0039).
+  - CKV_AWS_58
+  - CKV_AWS_136
+
+  # VPC flow logs, default security group management, DNSSEC and Route 53 query
+  # logging. Valid hardening, all of it billed by volume, none of it in the
+  # approved scope for this phase.
+  - CKV2_AWS_11
+  - CKV2_AWS_12
+  - CKV2_AWS_38
+  - CKV2_AWS_39
