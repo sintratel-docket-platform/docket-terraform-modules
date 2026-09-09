@@ -60,7 +60,7 @@ jobs:
             fi
           }
           scan_p '(?<![0-9])(?!0{12})[0-9]{12}(?![0-9])' 'A 12-digit identifier looks like an AWS account ID.'
-          scan 'arn:aws:[a-z0-9-]*:[a-z0-9-]*:[0-9]{12}'     'Account-qualified ARN found.'
+          scan_p 'arn:aws:[a-z0-9-]*:[a-z0-9-]*:(?!0{12})[0-9]{12}' 'Account-qualified ARN found.'
           scan '(AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY)' 'Credential material found.'
 
           # The project-specific strings live in a secret rather than in this
@@ -192,6 +192,10 @@ jobs:
         with:
           working-dir: modules
           recursive: true
+          # working-dir already scopes the walk. Leaving recursive-path at its
+          # default makes the action look for modules/modules and fail with
+          # "stat modules/modules: no such file or directory".
+          recursive-path: .
           output-file: README.md
           output-method: inject
           fail-on-diff: true
