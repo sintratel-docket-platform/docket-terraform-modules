@@ -226,3 +226,23 @@ jobs:
         run: |
           tflint --init
           bash scripts/verify-iac-rules.sh
+
+  # Only on main. On a pull request the red check already sits in front of the
+  # author, and notifying again trains the team to ignore the channel.
+  notify:
+    name: Report a failure
+    needs: [exposure, static, lint, security, test, docs, rules]
+    if: failure() && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Post to Slack
+        env:
+          WEBHOOK: ${{ secrets.SLACK_ALERTS_WEBHOOK }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          jq -n \
+            --arg sha "${GITHUB_SHA::7}" \
+            --arg url "$RUN_URL" \
+            '{text: (":x: *docket-terraform-modules* failed on main\ncommit `\($sha)`\n<\($url)|Open the run>")}' \
+          | curl -sfS -X POST -H 'Content-type: application/json' --data @- "$WEBHOOK"
