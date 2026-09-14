@@ -14,9 +14,31 @@ variable "service_names" {
 }
 
 variable "max_image_count" {
-  description = "Number of images retained per repository. The ECR free tier covers 500 MB per month, so pruning is not optional."
+  description = "Number of images retained per repository, among those no promotion has tagged. The ECR free tier covers 500 MB per month, so pruning is not optional."
   type        = number
   default     = 10
+}
+
+variable "max_promoted_image_count" {
+  description = "Number of promoted images retained per repository. An environment's current version is always among its most recent promotions, so this bounds history, not what is deployed."
+  type        = number
+  default     = 20
+
+  validation {
+    condition     = var.max_promoted_image_count >= 1
+    error_message = "At least one promoted image must be kept, or an environment can lose the image it declares."
+  }
+}
+
+variable "promoted_tag_prefix" {
+  description = "Tag prefix a promotion adds to the image it moves. Images carrying it are kept by max_promoted_image_count instead of max_image_count."
+  type        = string
+  default     = "promoted-"
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9._-]*$", var.promoted_tag_prefix))
+    error_message = "The prefix must be a valid start of an image tag."
+  }
 }
 
 variable "scan_on_push" {
