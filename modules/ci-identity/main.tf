@@ -14,6 +14,23 @@ locals {
     for branch in var.allowed_branches :
     "repo:${local.org}/${var.infra_repository}@${var.repository_ids[var.infra_repository]}:ref:refs/heads/${branch}"
   ]
+
+  # Empty unless gitops_repository is set, so neither manifests role exists.
+  manifests_repositories = var.gitops_repository == null ? [] : [var.gitops_repository]
+
+  manifests_pin_subjects = flatten([
+    for repo in local.manifests_repositories : [
+      for branch in var.allowed_branches :
+      "repo:${local.org}/${repo}@${var.repository_ids[repo]}:ref:refs/heads/${branch}"
+    ]
+  ])
+
+  # A pull request presents the subject `pull_request`, not a ref. Only the read
+  # role trusts it.
+  manifests_read_subjects = concat(
+    [for repo in local.manifests_repositories : "repo:${local.org}/${repo}@${var.repository_ids[repo]}:pull_request"],
+    local.manifests_pin_subjects,
+  )
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
@@ -511,4 +528,124 @@ resource "aws_iam_role_policy" "deploy" {
   name   = "provision-infrastructure"
   role   = aws_iam_role.deploy.id
   policy = data.aws_iam_policy_document.deploy_permissions.json
+}
+
+# ---------- Manifests repository roles: read and pin images ----------
+#
+# The manifests repository checks on every pull request that a promoted image
+# exists, and after a merge adds a promoted tag the registry lifecycle keeps.
+# Reading is safe from an unreviewed pull request; writing is not. IAM can only
+# separate the two in the trust policy, so each is its own role.
+
+data "aws_iam_policy_document" "manifests_read_trust" {
+  for_each = toset(local.manifests_repositories)
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = local.manifests_read_subjects
+    }
+  }
+}
+
+data "aws_iam_policy_document" "manifests_read_permissions" {
+  for_each = toset(local.manifests_repositories)
+
+  statement {
+    sid       = "DescribeImages"
+    effect    = "Allow"
+    actions   = ["ecr:DescribeImages"]
+    resources = var.ecr_repository_arns
+  }
+}
+
+resource "aws_iam_role" "manifests_read" {
+  for_each = toset(local.manifests_repositories)
+
+  name               = "GitHubActionsManifestsReadRole"
+  description        = "Check from the manifests repository that an image exists in ECR"
+  assume_role_policy = data.aws_iam_policy_document.manifests_read_trust[each.key].json
+
+  tags = { Name = "GitHubActionsManifestsReadRole" }
+}
+
+resource "aws_iam_role_policy" "manifests_read" {
+  for_each = toset(local.manifests_repositories)
+
+  name   = "describe-images"
+  role   = aws_iam_role.manifests_read[each.key].id
+  policy = data.aws_iam_policy_document.manifests_read_permissions[each.key].json
+}
+
+data "aws_iam_policy_document" "manifests_pin_trust" {
+  for_each = toset(local.manifests_repositories)
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = local.manifests_pin_subjects
+    }
+  }
+}
+
+# BatchGetImage reads the existing manifest and PutImage writes it back under a
+# new tag, so the digest never changes. Tag immutability still forbids moving an
+# existing tag; this can only add one.
+data "aws_iam_policy_document" "manifests_pin_permissions" {
+  for_each = toset(local.manifests_repositories)
+
+  statement {
+    sid       = "TagExistingImages"
+    effect    = "Allow"
+    actions   = ["ecr:BatchGetImage", "ecr:DescribeImages", "ecr:PutImage"]
+    resources = var.ecr_repository_arns
+  }
+}
+
+resource "aws_iam_role" "manifests_pin" {
+  for_each = toset(local.manifests_repositories)
+
+  name               = "GitHubActionsManifestsPinRole"
+  description        = "Tag promoted images in ECR from the manifests repository"
+  assume_role_policy = data.aws_iam_policy_document.manifests_pin_trust[each.key].json
+
+  tags = { Name = "GitHubActionsManifestsPinRole" }
+}
+
+resource "aws_iam_role_policy" "manifests_pin" {
+  for_each = toset(local.manifests_repositories)
+
+  name   = "tag-promoted-images"
+  role   = aws_iam_role.manifests_pin[each.key].id
+  policy = data.aws_iam_policy_document.manifests_pin_permissions[each.key].json
 }

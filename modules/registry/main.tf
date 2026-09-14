@@ -21,16 +21,33 @@ resource "aws_ecr_lifecycle_policy" "this" {
 
   repository = each.value.name
 
+  # ECR lets the first rule that selects an image decide its fate, and requires
+  # the `any` rule to come last. Promoted images are therefore selected first,
+  # by the tag a promotion adds, and counted apart: publishing to development
+  # never pushes out an image staging or production still declares.
   policy = jsonencode({
-    rules = [{
-      rulePriority = 1
-      description  = "Keep only the last ${var.max_image_count} images"
-      selection = {
-        tagStatus   = "any"
-        countType   = "imageCountMoreThan"
-        countNumber = var.max_image_count
-      }
-      action = { type = "expire" }
-    }]
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep the last ${var.max_promoted_image_count} promoted images"
+        selection = {
+          tagStatus     = "tagged"
+          tagPrefixList = [var.promoted_tag_prefix]
+          countType     = "imageCountMoreThan"
+          countNumber   = var.max_promoted_image_count
+        }
+        action = { type = "expire" }
+      },
+      {
+        rulePriority = 2
+        description  = "Keep only the last ${var.max_image_count} other images"
+        selection = {
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = var.max_image_count
+        }
+        action = { type = "expire" }
+      },
+    ]
   })
 }
