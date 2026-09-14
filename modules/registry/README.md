@@ -32,8 +32,10 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_image_tag_mutability"></a> [image\_tag\_mutability](#input\_image\_tag\_mutability) | Whether published tags can be overwritten. IMMUTABLE is what a GitOps promotion flow requires. | `string` | `"IMMUTABLE"` | no |
-| <a name="input_max_image_count"></a> [max\_image\_count](#input\_max\_image\_count) | Number of images retained per repository. The ECR free tier covers 500 MB per month, so pruning is not optional. | `number` | `10` | no |
+| <a name="input_max_image_count"></a> [max\_image\_count](#input\_max\_image\_count) | Number of images retained per repository, among those no promotion has tagged. The ECR free tier covers 500 MB per month, so pruning is not optional. | `number` | `10` | no |
+| <a name="input_max_promoted_image_count"></a> [max\_promoted\_image\_count](#input\_max\_promoted\_image\_count) | Number of promoted images retained per repository. An environment's current version is always among its most recent promotions, so this bounds history, not what is deployed. | `number` | `20` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Prefix for every resource name this module creates. Keeps the module reusable: it names nothing after a particular project. | `string` | n/a | yes |
+| <a name="input_promoted_tag_prefix"></a> [promoted\_tag\_prefix](#input\_promoted\_tag\_prefix) | Tag prefix a promotion adds to the image it moves. Images carrying it are kept by max\_promoted\_image\_count instead of max\_image\_count. | `string` | `"promoted-"` | no |
 | <a name="input_scan_on_push"></a> [scan\_on\_push](#input\_scan\_on\_push) | When true, ECR scans every published image for known vulnerabilities. | `bool` | `true` | no |
 | <a name="input_service_names"></a> [service\_names](#input\_service\_names) | Microservice names. One ECR repository is created per name. | `list(string)` | n/a | yes |
 
