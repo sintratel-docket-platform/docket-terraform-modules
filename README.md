@@ -64,19 +64,27 @@ the accepted trade-off of a modules monorepo and is fine at this size. If the
 modules start releasing at visibly different cadences, the answer is component
 tags (`network/v1.2.0`), not more repositories.
 
-Releases are cut by hand today:
+Releases are automatic, from the Conventional Commits (ADR-013 in
+`docket-architecture`):
 
-```bash
-git tag -a v1.2.0 -m "What changed and why"
-git push origin v1.2.0
-```
+1. A pull request that changes a module merges into `main`.
+2. `.github/workflows/release.yml` runs release-please, which reads the commits
+   that touched `modules/` since the last release. A `feat` bumps the minor, a
+   `fix` or `perf` the patch, and `!` or a `BREAKING CHANGE:` footer the major.
+   Anything else, and any change outside `modules/`, releases nothing.
+3. It opens, or updates, a single release pull request titled
+   `chore: release X.Y.Z`, carrying the changelog.
+4. A person approves and merges it. Merging creates the `vX.Y.Z` tag. That is
+   the deliberate step: several module changes can wait in one release.
+5. Renovate, in `docket-infrastructure`, opens a pull request per stack moving
+   `?ref=` to the new tag, never for production. A person reviews its plan,
+   merges it and applies.
 
-`release-please` would do this from the Conventional Commits, and the workflow
-for it is in `.github/workflows/release.yml`, but it cannot run: the
-organisation sets workflow permissions to read-only and forbids Actions from
-creating pull requests, and a repository cannot override that. Enabling it is
-one organisation setting — Settings, Actions, General, Workflow permissions —
-and one line in that file.
+Tags are immutable: a ruleset blocks deleting, moving or force-updating
+`refs/tags/v*`. The last released version lives in
+`.release-please-manifest.json`, and `release-please-config.json` holds the
+rest of the setup. Never create a `v*` tag by hand; it would put a version in
+the history that the release pull request does not know about.
 
 ## Working on a module
 
