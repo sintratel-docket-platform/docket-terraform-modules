@@ -28,6 +28,17 @@ variable "repository_ids" {
   type        = map(string)
 }
 
+variable "gitops_repository" {
+  description = "Manifests repository allowed to check images in ECR from pull requests, and to tag promoted images from allowed branches. Null creates neither role."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.gitops_repository == null ? true : contains(keys(var.repository_ids), var.gitops_repository)
+    error_message = "The manifests repository needs its numeric identifier in repository_ids; the trust uses the immutable subject."
+  }
+}
+
 variable "region" {
   description = "AWS region that contains the regional Docket resources."
   type        = string
