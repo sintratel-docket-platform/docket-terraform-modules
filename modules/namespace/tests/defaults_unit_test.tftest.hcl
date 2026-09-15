@@ -100,3 +100,28 @@ run "service_account_does_not_automount_its_token" {
     error_message = "The application services do not call the cluster API; that token would only be useful to steal."
   }
 }
+
+run "operators_read_routes_not_ingresses" {
+  command = plan
+
+  # Environments are exposed through Gateway API routes (card #53); an Ingress
+  # no longer exists to read. An operator diagnosing why a host does not answer
+  # needs to see the route and its status.
+  assert {
+    condition = anytrue([
+      for rule in kubernetes_role.operator.rule :
+      contains(rule.api_groups, "gateway.networking.k8s.io")
+      && contains(rule.resources, "httproutes")
+      && toset(rule.verbs) == toset(["get", "list", "watch"])
+    ])
+    error_message = "The operator Role must read httproutes in gateway.networking.k8s.io, and only read them."
+  }
+
+  assert {
+    condition = alltrue([
+      for rule in kubernetes_role.operator.rule :
+      !contains(rule.resources, "ingresses")
+    ])
+    error_message = "The operator Role must not name ingresses; nothing declares one."
+  }
+}
