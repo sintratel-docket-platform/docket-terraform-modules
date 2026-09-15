@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/sintratel-docket-platform/docket-terraform-modules/compare/v3.1.0...v3.2.0) (2026-09-15)
+
+
+### Features
+
+* **namespace:** let operators read routes instead of ingresses ([#7](https://github.com/sintratel-docket-platform/docket-terraform-modules/issues/7)) ([4ac8999](https://github.com/sintratel-docket-platform/docket-terraform-modules/commit/4ac89992a91ab5abfdb9e8ea62c8a27e35e8a735))
+
 ## [3.1.0](https://github.com/sintratel-docket-platform/docket-terraform-modules/compare/v3.0.0...v3.1.0) (2026-09-14)
 
 
