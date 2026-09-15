@@ -29,6 +29,8 @@ The fifth layer lives outside the cluster: each IRSA role reads only its own SSM
 
 **The `Role` does not grant `secrets`.** An operator who can read secrets holds the environment `JWT_SECRET`, and from there the rest of the RBAC stops mattering. Secrets are read from SSM, where IAM controls the permission.
 
+**The `Role` reads the environment's `HTTPRoute`s** and nothing else of the Gateway API. The routes live in the environment namespace and say whether the shared gateway accepted them; the gateway itself lives in its own namespace, outside this `Role`.
+
 **`allow_exec` is closed in production.** Opening a shell inside a pod exposes its environment variables and its mounted secrets, granting through the back door exactly what omitting `secrets` denies at the front.
 
 **The `RoleBinding` points at a group.** The group is where IAM meets Kubernetes: `aws_eks_access_entry` accepts `kubernetes_groups`, and an entry with `docket:dev` and no attached policy leaves that person with this `Role` and nothing else.
