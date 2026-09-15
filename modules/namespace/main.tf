@@ -102,7 +102,15 @@ resource "kubernetes_role" "operator" {
 
   rule {
     api_groups = ["networking.k8s.io"]
-    resources  = ["ingresses", "networkpolicies"]
+    resources  = ["networkpolicies"]
+    verbs      = ["get", "list", "watch"]
+  }
+
+  # Environments are exposed through Gateway API routes. Reading a route and its
+  # status is how an operator finds out why a host does not answer.
+  rule {
+    api_groups = ["gateway.networking.k8s.io"]
+    resources  = ["httproutes"]
     verbs      = ["get", "list", "watch"]
   }
 
