@@ -151,8 +151,17 @@ resource "aws_eks_node_group" "this" {
   depends_on = [aws_iam_role_policy_attachment.nodes]
 }
 
+# An add-on in addon_version_overrides is excluded here rather than looked up
+# with a fallback: a fallback expression still references this data source
+# and inherits its "known after apply" deferral whenever aws_eks_cluster.this
+# has a pending change unrelated to the add-on's version. Excluding the key
+# from for_each means the overridden add-on has no dependency on this data
+# source, or on aws_eks_cluster.this, at all.
 data "aws_eks_addon_version" "this" {
-  for_each = toset(["vpc-cni", "coredns", "kube-proxy", "eks-pod-identity-agent"])
+  for_each = toset([
+    for name in ["vpc-cni", "coredns", "kube-proxy", "eks-pod-identity-agent"] :
+    name if !contains(keys(var.addon_version_overrides), name)
+  ])
 
   addon_name         = each.value
   kubernetes_version = aws_eks_cluster.this.version
@@ -162,7 +171,7 @@ data "aws_eks_addon_version" "this" {
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name  = aws_eks_cluster.this.name
   addon_name    = "vpc-cni"
-  addon_version = data.aws_eks_addon_version.this["vpc-cni"].version
+  addon_version = try(var.addon_version_overrides["vpc-cni"], data.aws_eks_addon_version.this["vpc-cni"].version)
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
@@ -183,7 +192,7 @@ resource "aws_eks_addon" "others" {
 
   cluster_name  = aws_eks_cluster.this.name
   addon_name    = each.value
-  addon_version = data.aws_eks_addon_version.this[each.value].version
+  addon_version = try(var.addon_version_overrides[each.value], data.aws_eks_addon_version.this[each.value].version)
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"

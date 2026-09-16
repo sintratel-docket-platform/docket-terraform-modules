@@ -95,3 +95,17 @@ variable "cluster_admin_principals" {
   description = "IAM ARNs granted administrative access to the cluster."
   type        = list(string)
 }
+
+variable "addon_version_overrides" {
+  description = "Explicit version pin per add-on, keyed by add-on name (vpc-cni, coredns, kube-proxy, eks-pod-identity-agent). An add-on with no entry here keeps tracking the version AWS marks as default for the cluster's Kubernetes version. Empty by default."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for name in keys(var.addon_version_overrides) :
+      contains(["vpc-cni", "coredns", "kube-proxy", "eks-pod-identity-agent"], name)
+    ])
+    error_message = "Keys must be one of: vpc-cni, coredns, kube-proxy, eks-pod-identity-agent."
+  }
+}

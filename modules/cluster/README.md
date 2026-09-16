@@ -32,7 +32,9 @@ EKS caps pods per node by the network interfaces of the instance type, and the c
 
 **Add-on ordering.** `coredns`, `kube-proxy` and `eks-pod-identity-agent` depend on the node group, because they need a node to run on. `vpc-cni` cannot depend on it: without the CNI no node reaches `Ready`, and the `depends_on` would be a circular block.
 
-**Add-on versions.** The `aws_eks_addon_version` data source returns the version AWS marks as default for the cluster Kubernetes version.
+**Add-on versions.** The `aws_eks_addon_version` data source returns the version AWS marks as default for the cluster Kubernetes version. This is the default for every add-on: `vpc-cni`, `coredns`, `kube-proxy` and `eks-pod-identity-agent`.
+
+**`addon_version_overrides` pins one add-on without pinning the rest.** Set a key (add-on name) to pin its version explicitly; any add-on without a key keeps tracking AWS's default. An overridden add-on is excluded from the `aws_eks_addon_version` lookup entirely, not merely defaulted to it, so it carries no dependency on the cluster resource and is unaffected by an unrelated pending change elsewhere in the cluster. This is meant for a deliberate, reviewable, temporary pin — recorded in the consumer's diff, not a permanent way to stop watching an add-on's version.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -77,6 +79,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_addon_version_overrides"></a> [addon\_version\_overrides](#input\_addon\_version\_overrides) | Explicit version pin per add-on, keyed by add-on name (vpc-cni, coredns, kube-proxy, eks-pod-identity-agent). An add-on with no entry here keeps tracking the version AWS marks as default for the cluster's Kubernetes version. Empty by default. | `map(string)` | `{}` | no |
 | <a name="input_cluster_admin_principals"></a> [cluster\_admin\_principals](#input\_cluster\_admin\_principals) | IAM ARNs granted administrative access to the cluster. | `list(string)` | n/a | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster. | `string` | n/a | yes |
 | <a name="input_enabled_log_types"></a> [enabled\_log\_types](#input\_enabled\_log\_types) | EKS control-plane log types sent to CloudWatch. | `list(string)` | <pre>[<br/>  "audit",<br/>  "authenticator"<br/>]</pre> | no |
