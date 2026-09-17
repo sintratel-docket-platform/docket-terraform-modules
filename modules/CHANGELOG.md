@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.0](https://github.com/sintratel-docket-platform/docket-terraform-modules/compare/v3.2.0...v3.3.0) (2026-09-16)
+
+
+### Features
+
+* **cluster:** support addon version overrides ([#10](https://github.com/sintratel-docket-platform/docket-terraform-modules/issues/10)) ([ce55b78](https://github.com/sintratel-docket-platform/docket-terraform-modules/commit/ce55b7845320a7e3c15b35a8ab6438f3feeb2967)), closes [#20](https://github.com/sintratel-docket-platform/docket-terraform-modules/issues/20)
+
 ## [3.2.0](https://github.com/sintratel-docket-platform/docket-terraform-modules/compare/v3.1.0...v3.2.0) (2026-09-15)
 
 
