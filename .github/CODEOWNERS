@@ -9,37 +9,37 @@
 # ---------------------------------------------------------------------------
 # Default: any change needs a platform reviewer
 # ---------------------------------------------------------------------------
-*                               @sintratel-docket-platform/platform
+*                               @EstebanGZam @isahrnd @juandavid175 @Melo088
 
 # ---------------------------------------------------------------------------
 # Governance — changing the rules requires broader agreement
 # ---------------------------------------------------------------------------
-AGENTS.md                       @sintratel-docket-platform/leads
-CONTRIBUTING.md                 @sintratel-docket-platform/leads
-CODEOWNERS                      @sintratel-docket-platform/leads
-.github/                        @sintratel-docket-platform/leads
+AGENTS.md                       @EstebanGZam @isahrnd @juandavid175 @Melo088
+CONTRIBUTING.md                 @EstebanGZam @isahrnd @juandavid175 @Melo088
+CODEOWNERS                      @EstebanGZam @isahrnd @juandavid175 @Melo088
+.github/                        @EstebanGZam @isahrnd @juandavid175 @Melo088
 
 # ---------------------------------------------------------------------------
 # docket-infrastructure
 # ---------------------------------------------------------------------------
 # Identity and state bootstrap carry the highest blast radius.
-modules/ci-identity/            @sintratel-docket-platform/leads
-stacks/bootstrap/               @sintratel-docket-platform/leads
-stacks/persistent/              @sintratel-docket-platform/leads
-policies/                       @sintratel-docket-platform/leads
+modules/ci-identity/            @EstebanGZam @isahrnd @juandavid175 @Melo088
+stacks/bootstrap/               @EstebanGZam @isahrnd @juandavid175 @Melo088
+stacks/persistent/              @EstebanGZam @isahrnd @juandavid175 @Melo088
+policies/                       @EstebanGZam @isahrnd @juandavid175 @Melo088
 
-modules/                        @sintratel-docket-platform/platform
-stacks/                         @sintratel-docket-platform/platform
+modules/                        @EstebanGZam @isahrnd @juandavid175 @Melo088
+stacks/                         @EstebanGZam @isahrnd @juandavid175 @Melo088
 
 # ---------------------------------------------------------------------------
 # docket-gitops — production sync policy is a controlled change
 # ---------------------------------------------------------------------------
-argocd/                         @sintratel-docket-platform/leads
-environments/prod/              @sintratel-docket-platform/leads
-environments/                   @sintratel-docket-platform/platform
-apps/                           @sintratel-docket-platform/platform
+argocd/                         @EstebanGZam @isahrnd @juandavid175 @Melo088
+environments/prod/              @EstebanGZam @isahrnd @juandavid175 @Melo088
+environments/                   @EstebanGZam @isahrnd @juandavid175 @Melo088
+apps/                           @EstebanGZam @isahrnd @juandavid175 @Melo088
 
 # ---------------------------------------------------------------------------
 # docket-architecture — public repository
 # ---------------------------------------------------------------------------
-decisions.md                    @sintratel-docket-platform/leads
+decisions.md                    @EstebanGZam @isahrnd @juandavid175 @Melo088
