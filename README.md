@@ -25,6 +25,8 @@ so what they create is the caller's to decide.
 
 ## Modules
 
+Also indexed, with the same table, in [`modules/README.md`](modules/README.md).
+
 | Module | Responsibility |
 |---|---|
 | [`network`](modules/network) | VPC, subnets, Internet Gateway, NAT Gateway, route tables, security groups |
@@ -103,3 +105,10 @@ consumer's pull request merges, that reference has to become a tag.
 Every pull request runs: the exposure scan, `fmt` and `validate` per module,
 TFLint, Trivy, Checkov, `terraform test`, and a `terraform-docs` diff so a
 published module's README cannot go stale.
+
+## Contributing
+
+[`CONTRIBUTING.md`](CONTRIBUTING.md) is the short, repository-local form of
+[`AGENTS.md`](https://github.com/sintratel-docket-platform/docket-architecture/blob/main/standards/AGENTS.md),
+which is normative. Pull requests follow
+[`.github/pull_request_template.md`](.github/pull_request_template.md).
